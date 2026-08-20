@@ -155,7 +155,21 @@
       saveCustomFields(defaultFields);
       return defaultFields;
     }
-    try{ return JSON.parse(raw).map(normalizeField); }catch(e){ return defaultFields; }
+    try{
+      var list = JSON.parse(raw).map(normalizeField);
+      // คืนค่าฟิลด์ระบบเดิมที่ถูกซ่อนจากบั๊กของเวอร์ชันก่อนเพียงครั้งเดียว
+      // หลังจาก migration แล้ว ผู้ใช้ยังสามารถลบฟิลด์ระบบจากหน้าจัดการได้ตามปกติ
+      if(!localStorage.getItem('system_fields_migrated_v3')){
+        defaultFields.forEach(function(def){
+          if(!list.some(function(f){ return f.id === def.id; })){
+            list.push(def);
+          }
+        });
+        saveCustomFields(list);
+        localStorage.setItem('system_fields_migrated_v3','1');
+      }
+      return list;
+    }catch(e){ return defaultFields; }
   }
 
   function saveCustomFields(list){
