@@ -1,11 +1,5 @@
 /* =========================================================
-   custom-fields.js (Updated)
-   ---------------------------------------------------------
-   - รองรับการแก้ไข ฟิลด์เดิม / เปลี่ยน Text <-> Dropdown
-   - เพิ่มตัวเลือกตำแหน่งการแสดงผล:
-     • ตั้งไฟล์เดี่ยว (single)
-     • เอกสารครบชุด (bundle)
-     • แสดงทั้งสองหน้า (both)
+   custom-fields.js (Auto-Detect Page & Switch Type Supported)
    ========================================================= */
 (function(){
 
@@ -19,8 +13,7 @@
     .cf-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
     .cf-card-title{font-size:14px;font-weight:800;color:var(--ink-900);}
     .cf-card-type{font-size:11px;font-weight:700;color:var(--teal-700);background:var(--teal-100);padding:2px 9px;border-radius:20px;margin-left:8px;}
-    .cf-card-target{font-size:11px;font-weight:700;color:var(--purple-700, #6b21a8);background:var(--purple-100, #f3e8ff);padding:2px 9px;border-radius:20px;margin-left:4px;}
-    .cf-card-meta{font-size:11.5px;color:var(--ink-300);margin-top:4px;}
+    .cf-card-target{font-size:11px;font-weight:700;color:#6b21a8;background:#f3e8ff;padding:2px 9px;border-radius:20px;margin-left:4px;}
     .cf-card-actions{display:flex;gap:8px;flex-shrink:0;}
     .cf-card-actions button{border:1.5px solid var(--line);background:#fff;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;color:var(--ink-700);}
     .cf-card-actions button:hover{border-color:var(--teal-500);color:var(--teal-700);}
@@ -37,7 +30,7 @@
   `;
   document.head.appendChild(style);
 
-  /* ---------- 2) inject the field-editor modal (add/edit) ---------- */
+  /* ---------- 2) inject field-editor modal ---------- */
   var modalWrap = document.createElement('div');
   modalWrap.innerHTML = `
     <div class="modal-overlay" id="fieldModal">
@@ -47,7 +40,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path d="M12 5v14M5 12h14"/></svg>
             <span id="fieldModalTitle">เพิ่ม/แก้ไข ฟิลด์</span>
           </div>
-          <button class="modal-close" onclick="closeModal('fieldModal')">
+          <button class="modal-close" type="button" id="cfCloseModalBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -79,15 +72,15 @@
           </div>
         </div>
         <div class="modal-foot">
-          <button class="btn-ghost" onclick="closeModal('fieldModal')">ยกเลิก</button>
-          <button class="btn-ghost solid" id="submitFieldBtn">บันทึกฟิลด์</button>
+          <button class="btn-ghost" type="button" id="cfCancelModalBtn">ยกเลิก</button>
+          <button class="btn-ghost solid" id="submitFieldBtn" type="button">บันทึกฟิลด์</button>
         </div>
       </div>
     </div>
   `;
   document.body.appendChild(modalWrap.querySelector('#fieldModal'));
 
-  /* ---------- 3) build the standalone "จัดการฟิลด์เพิ่มเติม" page ---------- */
+  /* ---------- 3) build page-fields ---------- */
   var pageHost = document.getElementById('page-fields');
   if(pageHost){
     pageHost.innerHTML = `
@@ -97,7 +90,7 @@
       </div>
       <div class="panel">
         <div class="cf-page-intro">
-          กำหนดฟิลด์กรอกข้อมูลเพิ่มเติม สามารถสลับประเภทระหว่างช่องข้อความอิสระกับ Dropdown และเลือกแสดงผลแยกระหว่างหน้า "ตั้งไฟล์เดี่ยว" หรือ "เอกสารครบชุด" ได้ตามต้องการ
+          กำหนดฟิลด์กรอกข้อมูลเพิ่มเติม แก้ไขฟิลด์ที่มีอยู่แล้ว สลับประเภทระหว่าง Text/Dropdown และเลือกแสดงผลแยกระหว่าง "ตั้งไฟล์เดี่ยว" หรือ "เอกสารครบชุด" ได้ตามต้องการ
         </div>
         <div class="cf-toolbar">
           <button class="btn-add-field" id="addFieldBtn" type="button">+ เพิ่มฟิลด์ใหม่</button>
@@ -108,7 +101,7 @@
     `;
   }
 
-  /* ---------- 4) storage helpers ---------- */
+  /* ---------- 4) Storage & Helpers ---------- */
   function loadCustomFields(){
     try{ return JSON.parse(localStorage.getItem('custom_fields')||'[]'); }catch(e){ return []; }
   }
@@ -120,8 +113,14 @@
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   }
+  function toggleModal(open){
+    var m = document.getElementById('fieldModal');
+    if(!m) return;
+    if(open) m.classList.add('open');
+    else m.classList.remove('open');
+  }
 
-  /* ---------- 5) render: field list page ---------- */
+  /* ---------- 5) Render Fields Page ---------- */
   function renderFieldsPage(){
     var list = loadCustomFields();
     var wrap = document.getElementById('adminFieldsList');
@@ -163,7 +162,7 @@
     });
   }
 
-  /* ---------- 6) add/edit modal behaviour ---------- */
+  /* ---------- 6) Modal Action Handlers ---------- */
   function cfAddOptionRow(value){
     var row = document.createElement('div');
     row.className = 'cf-option-row';
@@ -176,8 +175,10 @@
   }
 
   document.getElementById('cfAddOptionBtn').addEventListener('click', function(){ cfAddOptionRow(''); });
-  
-  // สลับการแสดงผลกล่อง Dropdown เมื่อเปลี่ยนประเภทฟิลด์ (รองรับเปลี่ยนจาก Text เป็น Dropdown)
+  document.getElementById('cfCloseModalBtn').addEventListener('click', function(){ toggleModal(false); });
+  document.getElementById('cfCancelModalBtn').addEventListener('click', function(){ toggleModal(false); });
+
+  // เมื่อเปลี่ยนประเภทฟิลด์ใน Modal (Text <-> Select)
   document.getElementById('cfType').addEventListener('change', function(){
     var isSelect = (this.value === 'select');
     document.getElementById('cfOptionsBlock').style.display = isSelect ? 'block' : 'none';
@@ -209,11 +210,12 @@
       document.getElementById('cfOptionsBlock').style.display = 'none';
       cfAddOptionRow('');
     }
-    document.getElementById('fieldModal').classList.add('open');
+    toggleModal(true);
   }
 
-  document.getElementById('addFieldBtn').addEventListener('click', function(){ openFieldModal(null); });
-  
+  var addBtn = document.getElementById('addFieldBtn');
+  if(addBtn) addBtn.addEventListener('click', function(){ openFieldModal(null); });
+
   document.getElementById('submitFieldBtn').addEventListener('click', function(){
     var label = document.getElementById('cfLabel').value.trim();
     var targetPage = document.getElementById('cfTargetPage').value;
@@ -251,46 +253,55 @@
     }
     
     saveCustomFields(list);
-    if(typeof closeModal === 'function') closeModal('fieldModal');
-    else document.getElementById('fieldModal').classList.remove('open');
-    
+    toggleModal(false);
     renderFieldsPage();
     renderCustomFieldsInCreatePage();
   });
 
-  /* ---------- 7) render: dynamic fields inside Create Pages ---------- */
-  // ฟังก์ชันวาดฟิลด์โดยสามารถส่ง pageType ('single' หรือ 'bundle') เพื่อกรองการแสดงผลได้
-  function renderCustomFieldsInCreatePage(pageType){
-    // รองรับ container แยก หรือ container รวม
-    var container = document.getElementById('customFieldsContainer');
-    if(!container) return;
-
-    var list = loadCustomFields();
-    
-    // กรองฟิลด์ตามหน้าปัจจุบัน
-    if(pageType){
-      list = list.filter(function(f){
-        return !f.targetPage || f.targetPage === 'both' || f.targetPage === pageType;
-      });
+  /* ---------- 7) Render Dynamic Fields in Form ---------- */
+  function renderCustomFieldsInCreatePage(forcedPageType){
+    // ตรวจจับหน้าอัตโนมัติ ถ้าไม่มีการส่งพารามิเตอร์เข้ามา
+    var currentPage = forcedPageType;
+    if(!currentPage){
+      var activePageEl = document.querySelector('.page.active');
+      if(activePageEl){
+        var id = activePageEl.id || '';
+        if(id.includes('single') || id.includes('create')) currentPage = 'single';
+        else if(id.includes('bundle') || id.includes('batch')) currentPage = 'bundle';
+      }
     }
 
-    if(!list.length){ container.innerHTML = ''; return; }
-    
-    container.innerHTML = '<div class="field-grid2" id="customFieldsGrid"></div>';
-    var grid = document.getElementById('customFieldsGrid');
-    
-    list.forEach(function(f){
-      var wrap = document.createElement('div');
-      wrap.className = 'field';
-      if(f.type === 'select'){
-        wrap.innerHTML = `<label>${escapeHtml(f.label)} <span style="font-weight:400;color:var(--ink-300);">(ไม่บังคับ)</span></label>
-          <select id="cf-input-${f.id}"><option value="">— เลือก ${escapeHtml(f.label)} —</option>
-          ${(f.options||[]).map(function(o){ return `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`; }).join('')}</select>`;
-      } else {
-        wrap.innerHTML = `<label>${escapeHtml(f.label)} <span style="font-weight:400;color:var(--ink-300);">(ไม่บังคับ)</span></label>
-          <input type="text" id="cf-input-${f.id}" placeholder="ระบุ${escapeHtml(f.label)}">`;
-      }
-      grid.appendChild(wrap);
+    // รองรับทั้ง container รวม และ container แยกตามหน้า
+    var containers = document.querySelectorAll('#customFieldsContainer, .customFieldsContainer');
+    if(!containers.length) return;
+
+    var list = loadCustomFields();
+
+    containers.forEach(function(container){
+      // กรองฟิลด์ให้ตรงกับหน้า
+      var filteredList = list.filter(function(f){
+        if(!currentPage) return true;
+        return !f.targetPage || f.targetPage === 'both' || f.targetPage === currentPage;
+      });
+
+      if(!filteredList.length){ container.innerHTML = ''; return; }
+
+      container.innerHTML = '<div class="field-grid2"></div>';
+      var grid = container.querySelector('.field-grid2');
+
+      filteredList.forEach(function(f){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        if(f.type === 'select'){
+          wrap.innerHTML = `<label>${escapeHtml(f.label)} <span style="font-weight:400;color:var(--ink-300);">(ไม่บังคับ)</span></label>
+            <select id="cf-input-${f.id}"><option value="">— เลือก ${escapeHtml(f.label)} —</option>
+            ${(f.options||[]).map(function(o){ return `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`; }).join('')}</select>`;
+        } else {
+          wrap.innerHTML = `<label>${escapeHtml(f.label)} <span style="font-weight:400;color:var(--ink-300);">(ไม่บังคับ)</span></label>
+            <input type="text" id="cf-input-${f.id}" placeholder="ระบุ${escapeHtml(f.label)}">`;
+        }
+        grid.appendChild(wrap);
+      });
     });
   }
 
@@ -308,17 +319,26 @@
     });
   }
 
-  /* ---------- 8) expose hooks ---------- */
+  /* ---------- 8) Expose Global Functions ---------- */
   window.renderFieldsPage = renderFieldsPage;
   window.renderCustomFieldsInCreatePage = renderCustomFieldsInCreatePage;
   window.getCustomFieldValues = getCustomFieldValues;
   window.resetCustomFieldValues = resetCustomFieldValues;
 
-  /* ---------- 9) initial render ---------- */
+  /* ---------- 9) Init & Event Listeners ---------- */
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', function(){ renderCustomFieldsInCreatePage(); });
   } else {
     renderCustomFieldsInCreatePage();
   }
+
+  // ดักจับเหตุการณ์การกดเปลี่ยนเมนู/หน้า เพื่อวาดฟิลด์ใหม่ตามหน้าที่สลับไปอัตโนมัติ
+  document.addEventListener('click', function(e){
+    if(e.target.closest('.nav-item') || e.target.closest('[data-page]')){
+      setTimeout(function(){
+        renderCustomFieldsInCreatePage();
+      }, 50);
+    }
+  });
 
 })();
