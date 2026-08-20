@@ -211,11 +211,12 @@
     });
     wrap.querySelectorAll('[data-del]').forEach(function(btn){
       btn.addEventListener('click', function(){
-        if(list.find(function(f){ return f.id === btn.dataset.del; })?.isSystem){
-          alert('ฟิลด์ระบบเดิมไม่สามารถลบได้ แต่สามารถแก้ไขชื่อและกติกาการกรอกได้');
-          return;
-        }
-        if(!confirm('ต้องการลบฟิลด์นี้หรือไม่?')) return;
+        var field = list.find(function(f){ return f.id === btn.dataset.del; });
+        if(!field) return;
+        var message = field.isSystem
+          ? 'ฟิลด์นี้เป็นฟิลด์เริ่มต้นของระบบ หากลบแล้วจะถูกซ่อนจากหน้าตั้งชื่อไฟล์ ต้องการลบหรือไม่?'
+          : 'ต้องการลบฟิลด์นี้หรือไม่?';
+        if(!confirm(message)) return;
         saveCustomFields(loadCustomFields().filter(function(f){ return f.id !== btn.dataset.del; }));
         renderFieldsPage();
         renderCustomFieldsInCreatePage();
@@ -370,11 +371,20 @@
       var binding = systemFieldBindings[f.id];
       if(!binding) return;
       var input = document.getElementById(binding.inputId);
+      var host = binding.fieldId ? document.getElementById(binding.fieldId) : (input && input.closest('.field'));
       applyInputRules(input, f);
       if(input){
         var label = input.closest('.field')?.querySelector('label');
         if(label && label.firstChild) label.firstChild.nodeValue = f.label + ' ';
       }
+    });
+
+    Object.keys(systemFieldBindings).forEach(function(id){
+      if(list.some(function(f){ return f.id === id; })) return;
+      var binding = systemFieldBindings[id];
+      var input = document.getElementById(binding.inputId);
+      var host = binding.fieldId ? document.getElementById(binding.fieldId) : (input && input.closest('.field'));
+      if(host) host.style.display = 'none';
     });
   }
 
