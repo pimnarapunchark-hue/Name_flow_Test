@@ -407,6 +407,8 @@
 
     containers.forEach(function(container){
       var filteredList = list.filter(function(f){
+        // ฟิลด์ระบบมีอยู่ในหน้าแบบฟอร์มเดิมแล้ว ไม่ต้องสร้างซ้ำในกลุ่มฟิลด์เพิ่มเติม
+        if(f.isSystem) return false;
         if(!currentPage) return true;
         return !f.targetPage || f.targetPage === 'both' || f.targetPage === currentPage;
       });
