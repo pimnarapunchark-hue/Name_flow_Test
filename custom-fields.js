@@ -1,9 +1,9 @@
 /* =========================================================
-   custom-fields.js (Auto-Detect Page & Switch Type Supported)
+   custom-fields.js (System Fields & Custom Fields Manager)
    ========================================================= */
 (function(){
 
-  /* ---------- 1) inject CSS ---------- */
+  /* ---------- 1) Inject CSS ---------- */
   var style = document.createElement('style');
   style.textContent = `
     .cf-toolbar{display:flex;justify-content:flex-end;margin-bottom:14px;}
@@ -30,7 +30,7 @@
   `;
   document.head.appendChild(style);
 
-  /* ---------- 2) inject field-editor modal ---------- */
+  /* ---------- 2) Inject Field Modal ---------- */
   var modalWrap = document.createElement('div');
   modalWrap.innerHTML = `
     <div class="modal-overlay" id="fieldModal">
@@ -80,39 +80,53 @@
   `;
   document.body.appendChild(modalWrap.querySelector('#fieldModal'));
 
-  /* ---------- 3) build page-fields ---------- */
+  /* ---------- 3) Setup Page Host ---------- */
   var pageHost = document.getElementById('page-fields');
   if(pageHost){
     pageHost.innerHTML = `
       <div class="page-title-row">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        <div class="page-title">จัดการฟิลด์เพิ่มเติม</div>
+        <div class="page-title">จัดการฟิลด์ทั้งหมด (รวมฟิลด์เริ่มต้น)</div>
       </div>
       <div class="panel">
         <div class="cf-page-intro">
-          กำหนดฟิลด์กรอกข้อมูลเพิ่มเติม แก้ไขฟิลด์ที่มีอยู่แล้ว สลับประเภทระหว่าง Text/Dropdown และเลือกแสดงผลแยกระหว่าง "ตั้งไฟล์เดี่ยว" หรือ "เอกสารครบชุด" ได้ตามต้องการ
+          กำหนดฟิลด์กรอกข้อมูลเพิ่มเติม แก้ไข หรือลบฟิลด์เดิมที่มีอยู่ตั้ง แต่เริ่มต้น รวมถึงสลับประเภท และเลือกแสดงผลแยกระหว่าง "ตั้งไฟล์เดี่ยว" หรือ "เอกสารครบชุด" ได้ตามต้องการ
         </div>
         <div class="cf-toolbar">
           <button class="btn-add-field" id="addFieldBtn" type="button">+ เพิ่มฟิลด์ใหม่</button>
         </div>
         <div id="adminFieldsList"></div>
-        <div class="cf-empty" id="adminFieldsEmpty" style="display:none;">ยังไม่มีฟิลด์ที่กำหนดเอง — กดปุ่ม "เพิ่มฟิลด์ใหม่" เพื่อเริ่มต้น</div>
+        <div class="cf-empty" id="adminFieldsEmpty" style="display:none;">ยังไม่มีฟิลด์ในระบบ — กดปุ่ม "เพิ่มฟิลด์ใหม่" เพื่อเริ่มต้น</div>
       </div>
     `;
   }
 
-  /* ---------- 4) Storage & Helpers ---------- */
+  /* ---------- 4) Default System Fields & Storage ---------- */
+  var defaultFields = [
+    { id: 'sys_session', label: 'ครั้งที่', targetPage: 'both', type: 'text', isSystem: true },
+    { id: 'sys_to', label: 'ถึง / ผู้รับ', targetPage: 'both', type: 'text', isSystem: true },
+    { id: 'sys_signer', label: 'ผู้มีอำนาจลงนาม (S)', targetPage: 'both', type: 'text', isSystem: true }
+  ];
+
   function loadCustomFields(){
-    try{ return JSON.parse(localStorage.getItem('custom_fields')||'[]'); }catch(e){ return []; }
+    var raw = localStorage.getItem('custom_fields');
+    if(!raw){
+      saveCustomFields(defaultFields);
+      return defaultFields;
+    }
+    try{ return JSON.parse(raw); }catch(e){ return defaultFields; }
   }
+
   function saveCustomFields(list){
     localStorage.setItem('custom_fields', JSON.stringify(list));
   }
+
   function escapeHtml(s){
     return String(s==null?'':s).replace(/[&<>"']/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   }
+
   function toggleModal(open){
     var m = document.getElementById('fieldModal');
     if(!m) return;
@@ -162,7 +176,7 @@
     });
   }
 
-  /* ---------- 6) Modal Action Handlers ---------- */
+  /* ---------- 6) Modal Actions ---------- */
   function cfAddOptionRow(value){
     var row = document.createElement('div');
     row.className = 'cf-option-row';
@@ -178,7 +192,6 @@
   document.getElementById('cfCloseModalBtn').addEventListener('click', function(){ toggleModal(false); });
   document.getElementById('cfCancelModalBtn').addEventListener('click', function(){ toggleModal(false); });
 
-  // เมื่อเปลี่ยนประเภทฟิลด์ใน Modal (Text <-> Select)
   document.getElementById('cfType').addEventListener('change', function(){
     var isSelect = (this.value === 'select');
     document.getElementById('cfOptionsBlock').style.display = isSelect ? 'block' : 'none';
@@ -260,7 +273,6 @@
 
   /* ---------- 7) Render Dynamic Fields in Form ---------- */
   function renderCustomFieldsInCreatePage(forcedPageType){
-    // ตรวจจับหน้าอัตโนมัติ ถ้าไม่มีการส่งพารามิเตอร์เข้ามา
     var currentPage = forcedPageType;
     if(!currentPage){
       var activePageEl = document.querySelector('.page.active');
@@ -271,14 +283,12 @@
       }
     }
 
-    // รองรับทั้ง container รวม และ container แยกตามหน้า
     var containers = document.querySelectorAll('#customFieldsContainer, .customFieldsContainer');
     if(!containers.length) return;
 
     var list = loadCustomFields();
 
     containers.forEach(function(container){
-      // กรองฟิลด์ให้ตรงกับหน้า
       var filteredList = list.filter(function(f){
         if(!currentPage) return true;
         return !f.targetPage || f.targetPage === 'both' || f.targetPage === currentPage;
@@ -327,16 +337,22 @@
 
   /* ---------- 9) Init & Event Listeners ---------- */
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ renderCustomFieldsInCreatePage(); });
+    document.addEventListener('DOMContentLoaded', function(){ 
+      renderFieldsPage();
+      renderCustomFieldsInCreatePage(); 
+    });
   } else {
+    renderFieldsPage();
     renderCustomFieldsInCreatePage();
   }
 
-  // ดักจับเหตุการณ์การกดเปลี่ยนเมนู/หน้า เพื่อวาดฟิลด์ใหม่ตามหน้าที่สลับไปอัตโนมัติ
   document.addEventListener('click', function(e){
     if(e.target.closest('.nav-item') || e.target.closest('[data-page]')){
       setTimeout(function(){
         renderCustomFieldsInCreatePage();
+        if(document.querySelector('#page-fields.active')){
+          renderFieldsPage();
+        }
       }, 50);
     }
   });
