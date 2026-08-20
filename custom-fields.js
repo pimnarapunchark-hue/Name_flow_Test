@@ -27,6 +27,12 @@
     .cf-option-remove:hover{color:var(--red);}
     .cf-empty{text-align:center;color:var(--ink-300);font-size:13px;padding:30px 0;}
     .cf-page-intro{font-size:12.5px;color:var(--ink-500);margin-bottom:14px;}
+    .cf-rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+    .cf-rule-grid .field{margin-bottom:0!important;}
+    .cf-rule-help{font-size:11px;color:var(--ink-500);margin-top:5px;line-height:1.5;}
+    .cf-system-badge{font-size:11px;font-weight:700;color:#925f09;background:var(--gold-100);padding:2px 9px;border-radius:20px;margin-left:4px;}
+    .cf-card-rules{font-size:11.5px;color:var(--ink-500);margin-top:10px;}
+    @media(max-width:600px){.cf-rule-grid{grid-template-columns:1fr;}}
   `;
   document.head.appendChild(style);
 
@@ -64,6 +70,28 @@
               <option value="text">ช่องข้อความอิสระ</option>
               <option value="select">ช่องแบบเลือกตัวเลือก (Dropdown)</option>
             </select>
+          </div>
+          <div id="cfRulesBlock">
+            <label style="display:block;font-size:12.5px;font-weight:700;color:var(--ink-700);margin-bottom:7px;">กติกาการกรอกข้อมูล</label>
+            <div class="cf-rule-grid">
+              <div class="field">
+                <label>ชนิดข้อมูล</label>
+                <select id="cfInputMode">
+                  <option value="any">ตัวเลขและตัวอักษร</option>
+                  <option value="number">ตัวเลขเท่านั้น</option>
+                  <option value="letters">ตัวอักษรเท่านั้น</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>จำนวนตัวเลขสูงสุด</label>
+                <input type="number" id="cfMaxDigits" min="0" step="1" placeholder="ไม่จำกัด">
+              </div>
+              <div class="field">
+                <label>จำนวนตัวอักษรสูงสุด</label>
+                <input type="number" id="cfMaxLetters" min="0" step="1" placeholder="ไม่จำกัด">
+              </div>
+            </div>
+            <div class="cf-rule-help">เว้นว่างหากไม่ต้องการจำกัดจำนวน ตัวอักษรภาษาไทยและช่องว่างนับเป็นข้อความ</div>
           </div>
           <div id="cfOptionsBlock" style="display:none;">
             <label style="display:block;font-size:12.5px;font-weight:700;color:var(--ink-700);margin-bottom:7px;">ตัวเลือกใน Dropdown</label>
@@ -103,10 +131,23 @@
 
   /* ---------- 4) Default System Fields & Storage ---------- */
   var defaultFields = [
-    { id: 'sys_session', label: 'ครั้งที่', targetPage: 'both', type: 'text', isSystem: true },
-    { id: 'sys_to', label: 'ถึง / ผู้รับ', targetPage: 'both', type: 'text', isSystem: true },
-    { id: 'sys_signer', label: 'ผู้มีอำนาจลงนาม (S)', targetPage: 'both', type: 'text', isSystem: true }
+    { id: 'sys_session', label: 'ครั้งที่', targetPage: 'both', type: 'text', inputMode: 'number', maxDigits: 3, maxLetters: 0, isSystem: true },
+    { id: 'sys_to', label: 'ถึง / ผู้รับ', targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 100, isSystem: true },
+    { id: 'sys_signer', label: 'ผู้มีอำนาจลงนาม (S)', targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 100, isSystem: true }
   ];
+
+  var systemFieldBindings = {
+    sys_session: { inputId: 'f-session', fieldId: 'field-session' },
+    sys_to: { inputId: 'f-to', fieldId: null },
+    sys_signer: { inputId: 'f-signer', fieldId: 'field-signer' }
+  };
+
+  function normalizeField(f){
+    f.inputMode = f.inputMode || 'any';
+    f.maxDigits = Number.isFinite(Number(f.maxDigits)) ? Math.max(0, Number(f.maxDigits)) : 0;
+    f.maxLetters = Number.isFinite(Number(f.maxLetters)) ? Math.max(0, Number(f.maxLetters)) : 0;
+    return f;
+  }
 
   function loadCustomFields(){
     var raw = localStorage.getItem('custom_fields');
@@ -114,7 +155,7 @@
       saveCustomFields(defaultFields);
       return defaultFields;
     }
-    try{ return JSON.parse(raw); }catch(e){ return defaultFields; }
+    try{ return JSON.parse(raw).map(normalizeField); }catch(e){ return defaultFields; }
   }
 
   function saveCustomFields(list){
@@ -151,8 +192,9 @@
         <div class="cf-card-head">
           <div>
             <span class="cf-card-title">${escapeHtml(f.label)}</span>
-            <span class="cf-card-type">${f.type==='select'?'Dropdown':'ข้อความ'}</span>
+             <span class="cf-card-type">${f.type==='select'?'Dropdown':'ข้อความ'}</span>
             <span class="cf-card-target">${targetText[f.targetPage || 'both']}</span>
+             ${f.isSystem?'<span class="cf-system-badge">ฟิลด์ระบบ</span>':''}
           </div>
           <div class="cf-card-actions">
             <button data-edit="${f.id}" type="button">แก้ไข</button>
@@ -160,6 +202,7 @@
           </div>
         </div>
         ${f.type==='select'?`<div class="cf-options-wrap">${(f.options||[]).map(function(o){return `<span class="cf-chip">${escapeHtml(o)}</span>`;}).join('')||'<span class="cf-chip">ยังไม่มีตัวเลือก</span>'}</div>`:''}
+        ${f.type!=='select'?`<div class="cf-card-rules">${f.inputMode==='number'?'ตัวเลขเท่านั้น':f.inputMode==='letters'?'ตัวอักษรเท่านั้น':'ตัวเลขและตัวอักษร'} · ตัวเลขสูงสุด ${f.maxDigits||'ไม่จำกัด'} · ตัวอักษรสูงสุด ${f.maxLetters||'ไม่จำกัด'}</div>`:''}
       </div>`;
     }).join('');
 
@@ -168,6 +211,10 @@
     });
     wrap.querySelectorAll('[data-del]').forEach(function(btn){
       btn.addEventListener('click', function(){
+        if(list.find(function(f){ return f.id === btn.dataset.del; })?.isSystem){
+          alert('ฟิลด์ระบบเดิมไม่สามารถลบได้ แต่สามารถแก้ไขชื่อและกติกาการกรอกได้');
+          return;
+        }
         if(!confirm('ต้องการลบฟิลด์นี้หรือไม่?')) return;
         saveCustomFields(loadCustomFields().filter(function(f){ return f.id !== btn.dataset.del; }));
         renderFieldsPage();
@@ -195,6 +242,7 @@
   document.getElementById('cfType').addEventListener('change', function(){
     var isSelect = (this.value === 'select');
     document.getElementById('cfOptionsBlock').style.display = isSelect ? 'block' : 'none';
+    document.getElementById('cfRulesBlock').style.display = isSelect ? 'none' : 'block';
     if(isSelect && document.getElementById('cfOptionsList').children.length === 0){
       cfAddOptionRow('');
     }
@@ -212,6 +260,10 @@
       document.getElementById('cfTargetPage').value = f.targetPage || 'both';
       document.getElementById('cfType').value = f.type;
       document.getElementById('cfOptionsBlock').style.display = (f.type === 'select') ? 'block' : 'none';
+      document.getElementById('cfRulesBlock').style.display = (f.type === 'select') ? 'none' : 'block';
+      document.getElementById('cfInputMode').value = f.inputMode || 'any';
+      document.getElementById('cfMaxDigits').value = f.maxDigits || '';
+      document.getElementById('cfMaxLetters').value = f.maxLetters || '';
       
       (f.options||[]).forEach(function(o){ cfAddOptionRow(o); });
       if(f.type === 'select' && !(f.options||[]).length) cfAddOptionRow('');
@@ -221,6 +273,10 @@
       document.getElementById('cfTargetPage').value = 'both';
       document.getElementById('cfType').value = 'text';
       document.getElementById('cfOptionsBlock').style.display = 'none';
+      document.getElementById('cfRulesBlock').style.display = 'block';
+      document.getElementById('cfInputMode').value = 'any';
+      document.getElementById('cfMaxDigits').value = '';
+      document.getElementById('cfMaxLetters').value = '';
       cfAddOptionRow('');
     }
     toggleModal(true);
@@ -233,6 +289,9 @@
     var label = document.getElementById('cfLabel').value.trim();
     var targetPage = document.getElementById('cfTargetPage').value;
     var type = document.getElementById('cfType').value;
+    var inputMode = document.getElementById('cfInputMode').value;
+    var maxDigits = parseInt(document.getElementById('cfMaxDigits').value, 10) || 0;
+    var maxLetters = parseInt(document.getElementById('cfMaxLetters').value, 10) || 0;
     
     if(!label){ alert('กรุณากรอกชื่อฟิลด์'); return; }
     
@@ -254,6 +313,9 @@
         f.targetPage = targetPage;
         f.type = type;
         f.options = options;
+        f.inputMode = inputMode;
+        f.maxDigits = maxDigits;
+        f.maxLetters = maxLetters;
       }
     } else {
       list.push({
@@ -261,7 +323,10 @@
         label: label,
         targetPage: targetPage,
         type: type,
-        options: options
+        options: options,
+        inputMode: inputMode,
+        maxDigits: maxDigits,
+        maxLetters: maxLetters
       });
     }
     
@@ -272,6 +337,47 @@
   });
 
   /* ---------- 7) Render Dynamic Fields in Form ---------- */
+  function applyInputRules(el, f){
+    if(!el || f.type === 'select') return;
+    el.dataset.inputMode = f.inputMode || 'any';
+    el.dataset.maxDigits = f.maxDigits || 0;
+    el.dataset.maxLetters = f.maxLetters || 0;
+    el.inputMode = f.inputMode === 'number' ? 'numeric' : 'text';
+    function clean(){
+      var value = el.value || '';
+      var mode = el.dataset.inputMode;
+      if(mode === 'number') value = value.replace(/[^\d]/g, '');
+      if(mode === 'letters') value = value.replace(/[^\p{L}\s]/gu, '');
+      var digits = 0, letters = 0, out = '';
+      Array.from(value).forEach(function(ch){
+        var isDigit = /\d/.test(ch);
+        var isLetter = /\p{L}/u.test(ch);
+        if(isDigit && Number(el.dataset.maxDigits) > 0 && digits >= Number(el.dataset.maxDigits)) return;
+        if(isLetter && Number(el.dataset.maxLetters) > 0 && letters >= Number(el.dataset.maxLetters)) return;
+        if(isDigit) digits++;
+        if(isLetter) letters++;
+        out += ch;
+      });
+      if(el.value !== out) el.value = out;
+    }
+    el.addEventListener('input', clean);
+    el.addEventListener('paste', function(){ setTimeout(clean, 0); });
+    clean();
+  }
+
+  function applySystemFieldSettings(list){
+    list.filter(function(f){ return f.isSystem; }).forEach(function(f){
+      var binding = systemFieldBindings[f.id];
+      if(!binding) return;
+      var input = document.getElementById(binding.inputId);
+      applyInputRules(input, f);
+      if(input){
+        var label = input.closest('.field')?.querySelector('label');
+        if(label && label.firstChild) label.firstChild.nodeValue = f.label + ' ';
+      }
+    });
+  }
+
   function renderCustomFieldsInCreatePage(forcedPageType){
     var currentPage = forcedPageType;
     if(!currentPage){
@@ -287,6 +393,7 @@
     if(!containers.length) return;
 
     var list = loadCustomFields();
+    applySystemFieldSettings(list);
 
     containers.forEach(function(container){
       var filteredList = list.filter(function(f){
@@ -311,6 +418,7 @@
             <input type="text" id="cf-input-${f.id}" placeholder="ระบุ${escapeHtml(f.label)}">`;
         }
         grid.appendChild(wrap);
+        applyInputRules(wrap.querySelector('input'), f);
       });
     });
   }
