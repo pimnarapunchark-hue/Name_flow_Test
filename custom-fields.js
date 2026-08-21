@@ -396,6 +396,8 @@
           </div>
           <div class="cf-card-actions">
             <button data-edit="${f.id}" type="button">แก้ไข</button>
+            <button data-del="${f.id}" class="danger" type="button">ลบ</button>
+          </div>
             ${!f.locked ? `<button data-del="${f.id}" class="danger" type="button">ลบ</button>` : ''}
           </div>
         </div>
