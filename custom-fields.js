@@ -388,17 +388,15 @@
         <div class="cf-card-head">
           <div>
             <span class="cf-card-title">${escapeHtml(f.label)}</span>
-             <span class="cf-card-type">${fieldTypeLabel(f)}</span>
+            <span class="cf-card-type">${fieldTypeLabel(f)}</span>
             <span class="cf-card-target">${targetText[f.targetPage || 'both'] || 'ปรับแต่งแล้ว'}</span>
-             ${f.isSystem?'<span class="cf-system-badge">ฟิลด์ระบบ</span>':''}
-             ${f.required?'<span class="cf-required-badge">จำเป็น</span>':''}
-             ${f.locked?'<span class="cf-locked-badge">ล็อกโครงสร้าง</span>':''}
+            ${f.isSystem?'<span class="cf-system-badge">ฟิลด์ระบบ</span>':''}
+            ${f.required?'<span class="cf-required-badge">จำเป็น</span>':''}
+            ${f.locked?'<span class="cf-locked-badge">ล็อกโครงสร้าง</span>':''}
           </div>
           <div class="cf-card-actions">
             <button data-edit="${f.id}" type="button">แก้ไข</button>
             <button data-del="${f.id}" class="danger" type="button">ลบ</button>
-          </div>
-            ${!f.locked ? `<button data-del="${f.id}" class="danger" type="button">ลบ</button>` : ''}
           </div>
         </div>
         ${f.type==='select'?`<div class="cf-options-wrap">${(f.options||[]).map(function(o){return `<span class="cf-chip">${escapeHtml(o)}</span>`;}).join('')||'<span class="cf-chip">ยังไม่มีตัวเลือก</span>'}</div>`:''}
