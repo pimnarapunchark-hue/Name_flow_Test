@@ -634,12 +634,11 @@
     });
   }
 
-  function renderCustomFieldsInCreatePage(forcedPageType){
+  function renderCustomFieldsInCreatePage(){
 
-  var containers =
-    document.querySelectorAll(
-      '#customFieldsContainer, .customFieldsContainer'
-    );
+  var containers = document.querySelectorAll(
+    '#customFieldsContainer, .customFieldsContainer'
+  );
 
   if(!containers.length) return;
 
@@ -650,101 +649,73 @@
 
   containers.forEach(function(container){
 
-    var target =
-      container.dataset.cfTarget || 'single';
+    var target = container.dataset.cfTarget || 'single';
 
 
-    var filteredList =
-      list.filter(function(f){
+    var filteredList = list.filter(function(f){
 
-        /* ฟิลด์ระบบไม่สร้างซ้ำ */
-
-        if(f.isSystem){
-          return false;
-        }
+      /* ฟิลด์ระบบไม่สร้างซ้ำ */
+      if(f.isSystem) return false;
 
 
-        var page =
-          f.targetPage || 'both';
+      var page = f.targetPage || 'both';
 
 
-        /* แสดงทุกส่วน */
-
-        if(page === 'both'){
-          return true;
-        }
-
-
-        /* ไฟล์เดี่ยวทุกประเภท */
-
-        if(page === 'single'){
-          return (
-            target === 'single'
-          );
-        }
+      /* แสดงทุกส่วนของระบบ */
+      if(page === 'both'){
+        return true;
+      }
 
 
-        /* ร่างหนังสือ */
-
-        if(page === 'single-draft'){
-          return (
-            target === 'single-draft'
-          );
-        }
+      /* ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท */
+      if(page === 'single'){
+        return target === 'single';
+      }
 
 
-        /* หนังสือลงนามแล้ว */
-
-        if(page === 'single-signed'){
-          return (
-            target === 'single-signed'
-          );
-        }
+      /* ร่างหนังสือ */
+      if(page === 'single-draft'){
+        return target === 'single-draft';
+      }
 
 
-        /* ชุดเอกสารทุกส่วน */
-
-        if(page === 'bundle'){
-
-          return (
-            target === 'bundle-common' ||
-            target === 'bundle-attachments' ||
-            target === 'bundle-draft-letter'
-          );
-
-        }
+      /* หนังสือลงนามแล้ว */
+      if(page === 'single-signed'){
+        return target === 'single-signed';
+      }
 
 
-        /* ข้อมูลส่วนกลาง */
-
-        if(page === 'bundle-common'){
-          return (
-            target === 'bundle-common'
-          );
-        }
-
-
-        /* เอกสารแนบ */
-
-        if(page === 'bundle-attachments'){
-          return (
-            target === 'bundle-attachments'
-          );
-        }
+      /* ชุดเอกสารครบชุด — ทุกส่วน */
+      if(page === 'bundle'){
+        return (
+          target === 'bundle-common' ||
+          target === 'bundle-attachments' ||
+          target === 'bundle-draft-letter'
+        );
+      }
 
 
-        /* หนังสือร่าง */
-
-        if(page === 'bundle-draft-letter'){
-          return (
-            target === 'bundle-draft-letter'
-          );
-        }
+      /* ชุดเอกสาร — ข้อมูลส่วนกลาง */
+      if(page === 'bundle-common'){
+        return target === 'bundle-common';
+      }
 
 
-        return false;
+      /* ชุดเอกสาร — เอกสารแนบ */
+      if(page === 'bundle-attachments'){
+        return target === 'bundle-attachments';
+      }
 
-      });
+
+      /* ชุดเอกสาร — หนังสือ(ร่าง) */
+      if(page === 'bundle-draft-letter'){
+        return target === 'bundle-draft-letter';
+      }
+
+
+      return false;
+
+    });
 
 
     if(!filteredList.length){
@@ -752,24 +723,18 @@
       container.innerHTML = '';
 
       return;
+
     }
 
 
-    container.innerHTML =
-      '<div class="field-grid2"></div>';
+    container.innerHTML = '<div class="field-grid2"></div>';
 
-
-    var grid =
-      container.querySelector(
-        '.field-grid2'
-      );
+    var grid = container.querySelector('.field-grid2');
 
 
     filteredList.forEach(function(f){
 
-      var wrap =
-        document.createElement('div');
-
+      var wrap = document.createElement('div');
 
       wrap.className = 'field';
 
@@ -777,55 +742,37 @@
       if(f.type === 'select'){
 
         wrap.innerHTML = `
-
           <label>
             ${escapeHtml(f.label)}
-            <span
-              style="
-                font-weight:400;
-                color:var(--ink-300);
-              "
-            >
+            <span style="font-weight:400;color:var(--ink-300);">
               (ไม่บังคับ)
             </span>
           </label>
 
           <select id="cf-input-${f.id}">
-
             <option value="">
               — เลือก ${escapeHtml(f.label)} —
             </option>
 
-            ${(f.options || [])
-              .map(function(option){
+            ${(f.options || []).map(function(option){
 
-                return `
-                  <option
-                    value="${escapeHtml(option)}"
-                  >
-                    ${escapeHtml(option)}
-                  </option>
-                `;
+              return `
+                <option value="${escapeHtml(option)}">
+                  ${escapeHtml(option)}
+                </option>
+              `;
 
-              })
-              .join('')
-            }
+            }).join('')}
 
           </select>
         `;
 
-      }else{
+      } else {
 
         wrap.innerHTML = `
-
           <label>
             ${escapeHtml(f.label)}
-            <span
-              style="
-                font-weight:400;
-                color:var(--ink-300);
-              "
-            >
+            <span style="font-weight:400;color:var(--ink-300);">
               (ไม่บังคับ)
             </span>
           </label>
@@ -842,7 +789,6 @@
 
       grid.appendChild(wrap);
 
-
       applyInputRules(
         wrap.querySelector('input'),
         f
@@ -853,42 +799,6 @@
   });
 
 }
-
-    var containers = document.querySelectorAll('#customFieldsContainer, .customFieldsContainer');
-    if(!containers.length) return;
-
-    var list = loadCustomFields();
-    applySystemFieldSettings(list);
-
-    containers.forEach(function(container){
-      var filteredList = list.filter(function(f){
-        // ฟิลด์ระบบมีอยู่ในหน้าแบบฟอร์มเดิมแล้ว ไม่ต้องสร้างซ้ำในกลุ่มฟิลด์เพิ่มเติม
-        if(f.isSystem) return false;
-        if(!currentPage) return true;
-        return !f.targetPage || f.targetPage === 'both' || f.targetPage === currentPage;
-      });
-
-      if(!filteredList.length){ container.innerHTML = ''; return; }
-
-      container.innerHTML = '<div class="field-grid2"></div>';
-      var grid = container.querySelector('.field-grid2');
-
-      filteredList.forEach(function(f){
-        var wrap = document.createElement('div');
-        wrap.className = 'field';
-        if(f.type === 'select'){
-          wrap.innerHTML = `<label>${escapeHtml(f.label)} <span style="font-weight:400;color:var(--ink-300);">(ไม่บังคับ)</span></label>
-            <select id="cf-input-${f.id}"><option value="">— เลือก ${escapeHtml(f.label)} —</option>
-            ${(f.options||[]).map(function(o){ return `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`; }).join('')}</select>`;
-        } else {
-          wrap.innerHTML = `<label>${escapeHtml(f.label)} <span style="font-weight:400;color:var(--ink-300);">(ไม่บังคับ)</span></label>
-            <input type="text" id="cf-input-${f.id}" placeholder="ระบุ${escapeHtml(f.label)}">`;
-        }
-        grid.appendChild(wrap);
-        applyInputRules(wrap.querySelector('input'), f);
-      });
-    });
-  }
 
   function getCustomFieldValues(){
     return loadCustomFields().map(function(f){
@@ -932,4 +842,3 @@
     }
   });
 
-})();
