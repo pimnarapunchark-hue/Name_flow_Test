@@ -31,8 +31,15 @@
     .cf-rule-grid .field{margin-bottom:0!important;}
     .cf-rule-help{font-size:11px;color:var(--ink-500);margin-top:5px;line-height:1.5;}
     .cf-system-badge{font-size:11px;font-weight:700;color:#925f09;background:var(--gold-100);padding:2px 9px;border-radius:20px;margin-left:4px;}
+    .cf-required-badge{font-size:11px;font-weight:700;color:#b91c1c;background:#fee2e2;padding:2px 9px;border-radius:20px;margin-left:4px;}
+    .cf-locked-badge{font-size:11px;font-weight:700;color:#475569;background:#e2e8f0;padding:2px 9px;border-radius:20px;margin-left:4px;}
     .cf-card-rules{font-size:11.5px;color:var(--ink-500);margin-top:10px;}
+    .cf-locked-note{font-size:12px;line-height:1.6;color:#925f09;background:var(--gold-100);border-radius:9px;padding:10px 13px;margin-top:4px;}
+    .cf-section-title{font-size:13.5px;font-weight:800;color:var(--ink-900);margin:26px 0 10px;display:flex;align-items:center;gap:8px;}
+    .cf-trash-card{opacity:.92;}
     @media(max-width:600px){.cf-rule-grid{grid-template-columns:1fr;}}
+    /* Forces a field hidden even when core page logic later toggles its inline style.display */
+    .cf-field-removed{display:none!important;}
   `;
   document.head.appendChild(style);
 
@@ -56,7 +63,7 @@
             <label>ชื่อฟิลด์ (ป้ายกำกับ)</label>
             <input type="text" id="cfLabel" placeholder="เช่น หมายเลขโครงการ, สถานที่จัดประชุม">
           </div>
-          <div class="field" style="margin-bottom:14px;">
+          <div class="field" id="cfTargetPageRow" style="margin-bottom:14px;">
             <label>แสดงผลในหน้าใด</label>
             <select id="cfTargetPage">
               <option value="both">แสดงทั้งสองหน้า (ไฟล์เดี่ยว & เอกสารครบชุด)</option>
@@ -64,13 +71,14 @@
               <option value="bundle">เอกสารครบชุด เท่านั้น</option>
             </select>
           </div>
-          <div class="field" style="margin-bottom:14px;">
+          <div class="field" id="cfTypeRow" style="margin-bottom:14px;">
             <label>ประเภทฟิลด์</label>
             <select id="cfType">
               <option value="text">ช่องข้อความอิสระ</option>
               <option value="select">ช่องแบบเลือกตัวเลือก (Dropdown)</option>
             </select>
           </div>
+          <div class="cf-locked-note" id="cfLockedNote" style="display:none;"></div>
           <div id="cfRulesBlock">
             <label style="display:block;font-size:12.5px;font-weight:700;color:var(--ink-700);margin-bottom:7px;">กติกาการกรอกข้อมูล</label>
             <div class="cf-rule-grid">
@@ -118,34 +126,67 @@
       </div>
       <div class="panel">
         <div class="cf-page-intro">
-          กำหนดฟิลด์กรอกข้อมูลเพิ่มเติม แก้ไข หรือลบฟิลด์เดิมที่มีอยู่ตั้ง แต่เริ่มต้น รวมถึงสลับประเภท และเลือกแสดงผลแยกระหว่าง "ตั้งไฟล์เดี่ยว" หรือ "เอกสารครบชุด" ได้ตามต้องการ
+          กำหนดฟิลด์กรอกข้อมูลในหน้า "ตั้งชื่อไฟล์เดี่ยว" ได้ทุกช่อง แก้ไขป้ายกำกับ ลบ/ซ่อน หรือกู้คืนฟิลด์ที่เคยลบไปแล้ว
+          ฟิลด์ที่มีป้าย <span class="cf-locked-badge" style="margin-left:0;">ล็อกโครงสร้าง</span> ผูกกับตรรกะการสร้างชื่อไฟล์ (เช่น ตัวเลือกในดรอปดาวน์) จึงแก้ไขได้เฉพาะป้ายกำกับ
+          และฟิลด์ที่มีป้าย <span class="cf-required-badge" style="margin-left:0;">จำเป็น</span> หากลบ/ซ่อน อาจทำให้สร้างชื่อไฟล์ไม่ได้ในบางกรณีจนกว่าจะกู้คืน
         </div>
         <div class="cf-toolbar">
           <button class="btn-add-field" id="addFieldBtn" type="button">+ เพิ่มฟิลด์ใหม่</button>
         </div>
         <div id="adminFieldsList"></div>
         <div class="cf-empty" id="adminFieldsEmpty" style="display:none;">ยังไม่มีฟิลด์ในระบบ — กดปุ่ม "เพิ่มฟิลด์ใหม่" เพื่อเริ่มต้น</div>
+
+        <div class="cf-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/></svg>
+          ฟิลด์ที่ถูกลบ (กู้คืนได้)
+        </div>
+        <div id="deletedFieldsList"></div>
+        <div class="cf-empty" id="deletedFieldsEmpty" style="display:none;">ยังไม่มีฟิลด์ที่ถูกลบ</div>
       </div>
     `;
   }
 
   /* ---------- 4) Default System Fields & Storage ---------- */
   var defaultFields = [
-    { id: 'sys_session', label: 'ครั้งที่', targetPage: 'both', type: 'text', inputMode: 'number', maxDigits: 3, maxLetters: 0, isSystem: true },
-    { id: 'sys_to', label: 'ถึง / ผู้รับ', targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 100, isSystem: true },
-    { id: 'sys_signer', label: 'ผู้มีอำนาจลงนาม (S)', targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 100, isSystem: true }
+    /* --- ฟิลด์หลัก ที่ผูกกับโครงสร้างการสร้างชื่อไฟล์ (แก้ได้เฉพาะป้ายกำกับ) --- */
+    { id: 'sys_date',     label: 'วันที่ของเอกสาร',     targetPage: 'both', type: 'date',   isSystem: true, locked: true, required: true },
+    { id: 'sys_doctype',  label: 'ประเภทเอกสาร',        targetPage: 'both', type: 'select', isSystem: true, locked: true, required: true },
+    { id: 'sys_division', label: 'กอง / ศูนย์ / กลุ่ม',   targetPage: 'both', type: 'select', isSystem: true, locked: true, required: true },
+    { id: 'sys_dept',     label: 'กลุ่มงาน / ฝ่าย',       targetPage: 'both', type: 'select', isSystem: true, locked: true, required: false },
+    { id: 'sys_category', label: 'หมวดหมู่เรื่อง',       targetPage: 'both', type: 'select', isSystem: true, locked: true, required: false },
+    /* --- ฟิลด์ข้อความ แก้ไขได้เต็มรูปแบบเหมือนฟิลด์เพิ่มเติมทั่วไป --- */
+    { id: 'sys_mdes',     label: 'รหัสส่วนราชการ',      targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 0, isSystem: true, locked: false, required: false },
+    { id: 'sys_order',    label: 'ลำดับหนังสือส่งออก',  targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 0, isSystem: true, locked: false, required: false },
+    { id: 'sys_letterno', label: 'เลขที่หนังสือส่งออก',  targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 0, isSystem: true, locked: false, required: false },
+    { id: 'sys_title',    label: 'ชื่อเรื่อง',            targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 0, isSystem: true, locked: false, required: false },
+    { id: 'sys_session',  label: 'ครั้งที่', targetPage: 'both', type: 'text', inputMode: 'number', maxDigits: 3, maxLetters: 0, isSystem: true, locked: false, required: false },
+    { id: 'sys_to',       label: 'ถึง / ผู้รับ', targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 100, isSystem: true, locked: false, required: false },
+    { id: 'sys_signer',   label: 'ผู้มีอำนาจลงนาม (S)', targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 100, isSystem: true, locked: false, required: false }
   ];
 
   var systemFieldBindings = {
-    sys_session: { inputId: 'f-session', fieldId: 'field-session' },
-    sys_to: { inputId: 'f-to', fieldId: null },
-    sys_signer: { inputId: 'f-signer', fieldId: 'field-signer' }
+    sys_date:     { inputId: 'f-date',      fieldId: 'field-date' },
+    sys_doctype:  { inputId: 'f-doctype',   fieldId: 'field-doctype' },
+    sys_division: { inputId: 'f-division',  fieldId: 'field-division' },
+    sys_dept:     { inputId: 'f-dept',      fieldId: 'field-dept' },
+    sys_category: { inputId: 'f-category',  fieldId: 'field-category' },
+    sys_mdes:     { inputId: 'f-mdes',      fieldId: 'field-mdes' },
+    sys_order:    { inputId: 'f-order',     fieldId: 'field-order' },
+    sys_letterno: { inputId: 'f-letter-no', fieldId: 'field-letter-no' },
+    sys_title:    { inputId: 'f-title',     fieldId: 'field-title' },
+    sys_session:  { inputId: 'f-session',   fieldId: 'field-session' },
+    sys_to:       { inputId: 'f-to',        fieldId: null },
+    sys_signer:   { inputId: 'f-signer',    fieldId: 'field-signer' }
   };
+
+  var MIGRATION_FLAG = 'system_fields_migrated_v4';
 
   function normalizeField(f){
     f.inputMode = f.inputMode || 'any';
     f.maxDigits = Number.isFinite(Number(f.maxDigits)) ? Math.max(0, Number(f.maxDigits)) : 0;
     f.maxLetters = Number.isFinite(Number(f.maxLetters)) ? Math.max(0, Number(f.maxLetters)) : 0;
+    f.locked = !!f.locked;
+    f.required = !!f.required;
     return f;
   }
 
@@ -153,20 +194,21 @@
     var raw = localStorage.getItem('custom_fields');
     if(!raw){
       saveCustomFields(defaultFields);
+      localStorage.setItem(MIGRATION_FLAG, '1');
       return defaultFields;
     }
     try{
       var list = JSON.parse(raw).map(normalizeField);
-      // คืนค่าฟิลด์ระบบเดิมที่ถูกซ่อนจากบั๊กของเวอร์ชันก่อนเพียงครั้งเดียว
+      // คืนค่าฟิลด์ระบบเดิม/ใหม่ที่ยังไม่เคยมีในรายการเพียงครั้งเดียวต่อรุ่น
       // หลังจาก migration แล้ว ผู้ใช้ยังสามารถลบฟิลด์ระบบจากหน้าจัดการได้ตามปกติ
-      if(!localStorage.getItem('system_fields_migrated_v3')){
+      if(!localStorage.getItem(MIGRATION_FLAG)){
         defaultFields.forEach(function(def){
           if(!list.some(function(f){ return f.id === def.id; })){
             list.push(def);
           }
         });
         saveCustomFields(list);
-        localStorage.setItem('system_fields_migrated_v3','1');
+        localStorage.setItem(MIGRATION_FLAG, '1');
       }
       return list;
     }catch(e){ return defaultFields; }
@@ -174,6 +216,42 @@
 
   function saveCustomFields(list){
     localStorage.setItem('custom_fields', JSON.stringify(list));
+  }
+
+  /* ---------- 4b) Trash (Deleted Fields) Storage ---------- */
+  function loadTrashedFields(){
+    try{ return JSON.parse(localStorage.getItem('deleted_custom_fields') || '[]'); }
+    catch(e){ return []; }
+  }
+
+  function saveTrashedFields(list){
+    localStorage.setItem('deleted_custom_fields', JSON.stringify(list));
+  }
+
+  function addToTrash(field){
+    var trash = loadTrashedFields().filter(function(t){ return t.id !== field.id; });
+    var snapshot = Object.assign({}, field, { deletedAt: Date.now() });
+    trash.unshift(snapshot);
+    saveTrashedFields(trash);
+  }
+
+  function restoreField(id){
+    var trash = loadTrashedFields();
+    var idx = trash.findIndex(function(t){ return t.id === id; });
+    if(idx === -1) return;
+    var field = Object.assign({}, trash[idx]);
+    delete field.deletedAt;
+    trash.splice(idx, 1);
+    saveTrashedFields(trash);
+    var list = loadCustomFields();
+    if(!list.some(function(f){ return f.id === field.id; })){
+      list.push(normalizeField(field));
+      saveCustomFields(list);
+    }
+  }
+
+  function purgeTrashedField(id){
+    saveTrashedFields(loadTrashedFields().filter(function(t){ return t.id !== id; }));
   }
 
   function escapeHtml(s){
@@ -190,14 +268,20 @@
   }
 
   /* ---------- 5) Render Fields Page ---------- */
+  function fieldTypeLabel(f){
+    if(f.type === 'select') return 'Dropdown';
+    if(f.type === 'date') return 'วันที่';
+    return 'ข้อความ';
+  }
+
   function renderFieldsPage(){
     var list = loadCustomFields();
     var wrap = document.getElementById('adminFieldsList');
     var empty = document.getElementById('adminFieldsEmpty');
     if(!wrap) return;
-    if(!list.length){ wrap.innerHTML=''; empty.style.display='block'; return; }
-    empty.style.display='none';
-    
+    if(!list.length){ wrap.innerHTML=''; if(empty) empty.style.display='block'; renderTrashSection(); return; }
+    if(empty) empty.style.display='none';
+
     var targetText = { 'both': 'ทั้งสองหน้า', 'single': 'ไฟล์เดี่ยว', 'bundle': 'เอกสารครบชุด' };
 
     wrap.innerHTML = list.map(function(f){
@@ -206,9 +290,11 @@
         <div class="cf-card-head">
           <div>
             <span class="cf-card-title">${escapeHtml(f.label)}</span>
-             <span class="cf-card-type">${f.type==='select'?'Dropdown':'ข้อความ'}</span>
+             <span class="cf-card-type">${fieldTypeLabel(f)}</span>
             <span class="cf-card-target">${targetText[f.targetPage || 'both']}</span>
              ${f.isSystem?'<span class="cf-system-badge">ฟิลด์ระบบ</span>':''}
+             ${f.required?'<span class="cf-required-badge">จำเป็น</span>':''}
+             ${f.locked?'<span class="cf-locked-badge">ล็อกโครงสร้าง</span>':''}
           </div>
           <div class="cf-card-actions">
             <button data-edit="${f.id}" type="button">แก้ไข</button>
@@ -216,7 +302,7 @@
           </div>
         </div>
         ${f.type==='select'?`<div class="cf-options-wrap">${(f.options||[]).map(function(o){return `<span class="cf-chip">${escapeHtml(o)}</span>`;}).join('')||'<span class="cf-chip">ยังไม่มีตัวเลือก</span>'}</div>`:''}
-        ${f.type!=='select'?`<div class="cf-card-rules">${f.inputMode==='number'?'ตัวเลขเท่านั้น':f.inputMode==='letters'?'ตัวอักษรเท่านั้น':'ตัวเลขและตัวอักษร'} · ตัวเลขสูงสุด ${f.maxDigits||'ไม่จำกัด'} · ตัวอักษรสูงสุด ${f.maxLetters||'ไม่จำกัด'}</div>`:''}
+        ${f.type==='text'?`<div class="cf-card-rules">${f.inputMode==='number'?'ตัวเลขเท่านั้น':f.inputMode==='letters'?'ตัวอักษรเท่านั้น':'ตัวเลขและตัวอักษร'} · ตัวเลขสูงสุด ${f.maxDigits||'ไม่จำกัด'} · ตัวอักษรสูงสุด ${f.maxLetters||'ไม่จำกัด'}</div>`:''}
       </div>`;
     }).join('');
 
@@ -227,13 +313,67 @@
       btn.addEventListener('click', function(){
         var field = list.find(function(f){ return f.id === btn.dataset.del; });
         if(!field) return;
-        var message = field.isSystem
-          ? 'ฟิลด์นี้เป็นฟิลด์เริ่มต้นของระบบ หากลบแล้วจะถูกซ่อนจากหน้าตั้งชื่อไฟล์ ต้องการลบหรือไม่?'
-          : 'ต้องการลบฟิลด์นี้หรือไม่?';
+        var message;
+        if(field.required){
+          message = '⚠️ ฟิลด์นี้จำเป็นต่อการสร้างชื่อไฟล์ หากลบ (ซ่อน) ระบบอาจไม่สามารถสร้างชื่อไฟล์ได้ในบางกรณี จนกว่าจะกู้คืนจากถังฟิลด์ที่ถูกลบ ต้องการลบหรือไม่?';
+        } else if(field.isSystem){
+          message = 'ฟิลด์นี้เป็นฟิลด์เริ่มต้นของระบบ หากลบแล้วจะถูกซ่อนจากหน้าตั้งชื่อไฟล์ (กู้คืนได้ภายหลังจากถังฟิลด์ที่ถูกลบ) ต้องการลบหรือไม่?';
+        } else {
+          message = 'ต้องการลบฟิลด์นี้หรือไม่? (กู้คืนได้ภายหลังจากถังฟิลด์ที่ถูกลบ)';
+        }
         if(!confirm(message)) return;
         saveCustomFields(loadCustomFields().filter(function(f){ return f.id !== btn.dataset.del; }));
+        addToTrash(field);
         renderFieldsPage();
         renderCustomFieldsInCreatePage();
+      });
+    });
+
+    renderTrashSection();
+  }
+
+  /* ---------- 5b) Render Trash Section ---------- */
+  function renderTrashSection(){
+    var wrap = document.getElementById('deletedFieldsList');
+    var empty = document.getElementById('deletedFieldsEmpty');
+    if(!wrap) return;
+    var trash = loadTrashedFields();
+    if(!trash.length){ wrap.innerHTML=''; if(empty) empty.style.display='block'; return; }
+    if(empty) empty.style.display='none';
+
+    wrap.innerHTML = trash.map(function(f){
+      var d = new Date(f.deletedAt);
+      var dateStr = isNaN(d.getTime()) ? '' : d.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'});
+      return `
+      <div class="cf-card cf-trash-card">
+        <div class="cf-card-head">
+          <div>
+            <span class="cf-card-title">${escapeHtml(f.label)}</span>
+             <span class="cf-card-type">${fieldTypeLabel(f)}</span>
+             ${f.isSystem?'<span class="cf-system-badge">ฟิลด์ระบบ</span>':''}
+             ${f.required?'<span class="cf-required-badge">จำเป็น</span>':''}
+          </div>
+          <div class="cf-card-actions">
+            <button data-restore="${f.id}" type="button">กู้คืน</button>
+            <button data-purge="${f.id}" class="danger" type="button">ลบถาวร</button>
+          </div>
+        </div>
+        <div class="cf-card-rules">ลบเมื่อ ${dateStr || 'ไม่ทราบวันที่'}</div>
+      </div>`;
+    }).join('');
+
+    wrap.querySelectorAll('[data-restore]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        restoreField(btn.dataset.restore);
+        renderFieldsPage();
+        renderCustomFieldsInCreatePage();
+      });
+    });
+    wrap.querySelectorAll('[data-purge]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!confirm('ลบฟิลด์นี้ออกจากถังถาวร จะไม่สามารถกู้คืนได้อีก ต้องการดำเนินการต่อหรือไม่?')) return;
+        purgeTrashedField(btn.dataset.purge);
+        renderTrashSection();
       });
     });
   }
@@ -266,27 +406,46 @@
   function openFieldModal(editId){
     document.getElementById('cfEditId').value = editId || '';
     document.getElementById('cfOptionsList').innerHTML = '';
-    
+    var lockedNote = document.getElementById('cfLockedNote');
+    var targetRow = document.getElementById('cfTargetPageRow');
+    var typeRow = document.getElementById('cfTypeRow');
+
     if(editId){
       var f = loadCustomFields().find(function(x){ return x.id === editId; });
       if(!f) return;
       document.getElementById('fieldModalTitle').textContent = 'แก้ไขฟิลด์';
       document.getElementById('cfLabel').value = f.label;
       document.getElementById('cfTargetPage').value = f.targetPage || 'both';
-      document.getElementById('cfType').value = f.type;
-      document.getElementById('cfOptionsBlock').style.display = (f.type === 'select') ? 'block' : 'none';
-      document.getElementById('cfRulesBlock').style.display = (f.type === 'select') ? 'none' : 'block';
-      document.getElementById('cfInputMode').value = f.inputMode || 'any';
-      document.getElementById('cfMaxDigits').value = f.maxDigits || '';
-      document.getElementById('cfMaxLetters').value = f.maxLetters || '';
-      
-      (f.options||[]).forEach(function(o){ cfAddOptionRow(o); });
-      if(f.type === 'select' && !(f.options||[]).length) cfAddOptionRow('');
+
+      // ฟิลด์ระบบแสดงอยู่ในหน้าแบบฟอร์มเดิมอยู่แล้ว ไม่ต้องเลือกหน้าแสดงผล/ประเภทฟิลด์
+      targetRow.style.display = f.isSystem ? 'none' : '';
+      typeRow.style.display = f.isSystem ? 'none' : '';
+
+      if(f.locked){
+        lockedNote.style.display = 'block';
+        lockedNote.textContent = 'ฟิลด์นี้ผูกกับโครงสร้างการสร้างชื่อไฟล์ของระบบ (เช่น รายการตัวเลือกที่ตายตัว) จึงแก้ไขได้เฉพาะป้ายกำกับเท่านั้น สามารถลบ (ซ่อน) และกู้คืนได้ตามปกติ' +
+          (f.required ? ' ⚠️ ฟิลด์นี้จำเป็นต่อการสร้างชื่อไฟล์ หากซ่อนไว้ ระบบอาจสร้างชื่อไฟล์ไม่ได้ในบางกรณี' : '');
+        document.getElementById('cfOptionsBlock').style.display = 'none';
+        document.getElementById('cfRulesBlock').style.display = 'none';
+      } else {
+        lockedNote.style.display = 'none';
+        document.getElementById('cfType').value = f.type;
+        document.getElementById('cfOptionsBlock').style.display = (f.type === 'select') ? 'block' : 'none';
+        document.getElementById('cfRulesBlock').style.display = (f.type === 'select') ? 'none' : 'block';
+        document.getElementById('cfInputMode').value = f.inputMode || 'any';
+        document.getElementById('cfMaxDigits').value = f.maxDigits || '';
+        document.getElementById('cfMaxLetters').value = f.maxLetters || '';
+        (f.options||[]).forEach(function(o){ cfAddOptionRow(o); });
+        if(f.type === 'select' && !(f.options||[]).length) cfAddOptionRow('');
+      }
     } else {
       document.getElementById('fieldModalTitle').textContent = 'เพิ่มฟิลด์ใหม่';
       document.getElementById('cfLabel').value = '';
       document.getElementById('cfTargetPage').value = 'both';
       document.getElementById('cfType').value = 'text';
+      lockedNote.style.display = 'none';
+      targetRow.style.display = '';
+      typeRow.style.display = '';
       document.getElementById('cfOptionsBlock').style.display = 'none';
       document.getElementById('cfRulesBlock').style.display = 'block';
       document.getElementById('cfInputMode').value = 'any';
@@ -302,30 +461,33 @@
 
   document.getElementById('submitFieldBtn').addEventListener('click', function(){
     var label = document.getElementById('cfLabel').value.trim();
-    var targetPage = document.getElementById('cfTargetPage').value;
-    var type = document.getElementById('cfType').value;
-    var inputMode = document.getElementById('cfInputMode').value;
-    var maxDigits = parseInt(document.getElementById('cfMaxDigits').value, 10) || 0;
-    var maxLetters = parseInt(document.getElementById('cfMaxLetters').value, 10) || 0;
-    
     if(!label){ alert('กรุณากรอกชื่อฟิลด์'); return; }
-    
-    var options = [];
-    if(type === 'select'){
-      options = Array.from(document.querySelectorAll('#cfOptionsList input'))
-                     .map(function(i){ return i.value.trim(); })
-                     .filter(Boolean);
-      if(!options.length){ alert('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับฟิลด์แบบ Dropdown'); return; }
-    }
-    
+
     var editId = document.getElementById('cfEditId').value;
     var list = loadCustomFields();
-    
+
     if(editId){
       var f = list.find(function(x){ return x.id === editId; });
-      if(f){
-        f.label = label;
-        f.targetPage = targetPage;
+      if(!f) return;
+      f.label = label;
+
+      // ฟิลด์ที่ล็อกโครงสร้าง (select/date ที่ผูกกับตรรกะสร้างชื่อไฟล์) แก้ได้แค่ป้ายกำกับ
+      if(!f.locked){
+        var targetPage = document.getElementById('cfTargetPage').value;
+        var type = document.getElementById('cfType').value;
+        var inputMode = document.getElementById('cfInputMode').value;
+        var maxDigits = parseInt(document.getElementById('cfMaxDigits').value, 10) || 0;
+        var maxLetters = parseInt(document.getElementById('cfMaxLetters').value, 10) || 0;
+
+        var options = [];
+        if(type === 'select'){
+          options = Array.from(document.querySelectorAll('#cfOptionsList input'))
+                         .map(function(i){ return i.value.trim(); })
+                         .filter(Boolean);
+          if(!options.length){ alert('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับฟิลด์แบบ Dropdown'); return; }
+        }
+
+        if(!f.isSystem) f.targetPage = targetPage;
         f.type = type;
         f.options = options;
         f.inputMode = inputMode;
@@ -333,18 +495,35 @@
         f.maxLetters = maxLetters;
       }
     } else {
+      var targetPage2 = document.getElementById('cfTargetPage').value;
+      var type2 = document.getElementById('cfType').value;
+      var inputMode2 = document.getElementById('cfInputMode').value;
+      var maxDigits2 = parseInt(document.getElementById('cfMaxDigits').value, 10) || 0;
+      var maxLetters2 = parseInt(document.getElementById('cfMaxLetters').value, 10) || 0;
+
+      var options2 = [];
+      if(type2 === 'select'){
+        options2 = Array.from(document.querySelectorAll('#cfOptionsList input'))
+                       .map(function(i){ return i.value.trim(); })
+                       .filter(Boolean);
+        if(!options2.length){ alert('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับฟิลด์แบบ Dropdown'); return; }
+      }
+
       list.push({
         id: 'cf_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
         label: label,
-        targetPage: targetPage,
-        type: type,
-        options: options,
-        inputMode: inputMode,
-        maxDigits: maxDigits,
-        maxLetters: maxLetters
+        targetPage: targetPage2,
+        type: type2,
+        options: options2,
+        inputMode: inputMode2,
+        maxDigits: maxDigits2,
+        maxLetters: maxLetters2,
+        isSystem: false,
+        locked: false,
+        required: false
       });
     }
-    
+
     saveCustomFields(list);
     toggleModal(false);
     renderFieldsPage();
@@ -353,7 +532,7 @@
 
   /* ---------- 7) Render Dynamic Fields in Form ---------- */
   function applyInputRules(el, f){
-    if(!el || f.type === 'select') return;
+    if(!el || f.type !== 'text') return;
     el.dataset.inputMode = f.inputMode || 'any';
     el.dataset.maxDigits = f.maxDigits || 0;
     el.dataset.maxLetters = f.maxLetters || 0;
@@ -381,24 +560,26 @@
   }
 
   function applySystemFieldSettings(list){
-    list.filter(function(f){ return f.isSystem; }).forEach(function(f){
-      var binding = systemFieldBindings[f.id];
-      if(!binding) return;
-      var input = document.getElementById(binding.inputId);
-      var host = binding.fieldId ? document.getElementById(binding.fieldId) : (input && input.closest('.field'));
-      applyInputRules(input, f);
-      if(input){
-        var label = input.closest('.field')?.querySelector('label');
-        if(label && label.firstChild) label.firstChild.nodeValue = f.label + ' ';
-      }
-    });
+    var present = {};
+    list.forEach(function(f){ if(f.isSystem) present[f.id] = f; });
 
     Object.keys(systemFieldBindings).forEach(function(id){
-      if(list.some(function(f){ return f.id === id; })) return;
       var binding = systemFieldBindings[id];
       var input = document.getElementById(binding.inputId);
       var host = binding.fieldId ? document.getElementById(binding.fieldId) : (input && input.closest('.field'));
-      if(host) host.style.display = 'none';
+      var f = present[id];
+
+      if(f){
+        // ใช้คลาส CSS (!important) แทนการเซ็ต style.display ตรงๆ
+        // เพื่อไม่ให้ถูกโค้ดหลักของหน้าฟอร์ม (เช่น การสลับโหมดหนังสือ/บันทึก) เขียนทับสถานะซ่อนทีหลัง
+        if(host) host.classList.remove('cf-field-removed');
+        applyInputRules(input, f);
+        var label = (input && input.closest('.field') && input.closest('.field').querySelector('label')) ||
+                    (host && host.querySelector('label'));
+        if(label && label.firstChild) label.firstChild.nodeValue = f.label + ' ';
+      } else {
+        if(host) host.classList.add('cf-field-removed');
+      }
     });
   }
 
@@ -471,9 +652,9 @@
 
   /* ---------- 9) Init & Event Listeners ---------- */
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ 
+    document.addEventListener('DOMContentLoaded', function(){
       renderFieldsPage();
-      renderCustomFieldsInCreatePage(); 
+      renderCustomFieldsInCreatePage();
     });
   } else {
     renderFieldsPage();
