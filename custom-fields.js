@@ -43,9 +43,10 @@
   `;
   document.head.appendChild(style);
 
-  /* ---------- 2) Inject Field Modal ---------- */
+  /* ---------- 2) Inject Field Modals ---------- */
   var modalWrap = document.createElement('div');
   modalWrap.innerHTML = `
+    <!-- แก้ไข/เพิ่ม ฟิลด์ Modal -->
     <div class="modal-overlay" id="fieldModal">
       <div class="modal-card">
         <div class="modal-head">
@@ -66,39 +67,15 @@
           <div class="field" id="cfTargetPageRow" style="margin-bottom:14px;">
             <label>แสดงผลในหน้าใด</label>
             <select id="cfTargetPage">
-            <option value="both">
-            ทุกส่วนของระบบ
-            </option>
-
-            <option value="single">
-            ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท
-            </option>
-
-            <option value="single-draft">
-            ตั้งชื่อไฟล์เดี่ยว — ร่างหนังสือ
-            </option>
-
-            <option value="single-signed">
-            ตั้งชื่อไฟล์เดี่ยว — หนังสือลงนามแล้ว
-            </option>
-
-            <option value="bundle">
-            ชุดเอกสารครบชุด — ทุกส่วน
-            </option>
-
-            <option value="bundle-common">
-            ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง
-            </option>
-
-            <option value="bundle-attachments">
-            ชุดเอกสารครบชุด — เอกสารแนบ
-            </option>
-
-            <option value="bundle-draft-letter">
-            ชุดเอกสารครบชุด — หนังสือ(ร่าง)
-            </option>
-
-          </select>
+              <option value="both">ทุกส่วนของระบบ</option>
+              <option value="single">ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท</option>
+              <option value="single-draft">ตั้งชื่อไฟล์เดี่ยว — ร่างหนังสือ</option>
+              <option value="single-signed">ตั้งชื่อไฟล์เดี่ยว — หนังสือลงนามแล้ว</option>
+              <option value="bundle">ชุดเอกสารครบชุด — ทุกส่วน</option>
+              <option value="bundle-common">ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง</option>
+              <option value="bundle-attachments">ชุดเอกสารครบชุด — เอกสารแนบ</option>
+              <option value="bundle-draft-letter">ชุดเอกสารครบชุด — หนังสือ(ร่าง)</option>
+            </select>
           </div>
           <div class="field" id="cfTypeRow" style="margin-bottom:14px;">
             <label>ประเภทฟิลด์</label>
@@ -142,8 +119,86 @@
         </div>
       </div>
     </div>
+
+    <!-- ลบ/ซ่อน ฟิลด์ Modal -->
+    <div class="modal-overlay" id="deleteFieldModal">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div class="modal-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/></svg>
+            <span>ลบ/ซ่อน ฟิลด์</span>
+          </div>
+          <button class="modal-close" type="button" id="closeDelModalBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="delFieldId" value="">
+          <div style="margin-bottom:15px; font-size:13.5px;">คุณกำลังจัดการฟิลด์: <b id="delFieldName" style="color:var(--teal-700);"></b></div>
+          <div class="field" style="margin-bottom:14px;">
+            <label>รูปแบบการลบ/ซ่อน</label>
+            <select id="delActionType">
+              <option value="trash">ลบออกจากระบบทั้งหมด (ย้ายไปถังขยะ)</option>
+              <option value="hide">ลบ/ซ่อนจากบางส่วน (คงไว้ในหน้าที่ต้องการแทน)</option>
+            </select>
+          </div>
+          <div class="field" id="delTargetWrap" style="display:none; margin-bottom:14px;">
+            <label>เลือกหน้าที่ยังต้องการให้แสดงผล (ที่เหลือจะถูกซ่อน)</label>
+            <select id="delTargetPage">
+              <option value="both">ทุกส่วนของระบบ</option>
+              <option value="single">ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท</option>
+              <option value="single-draft">ตั้งชื่อไฟล์เดี่ยว — ร่างหนังสือ</option>
+              <option value="single-signed">ตั้งชื่อไฟล์เดี่ยว — หนังสือลงนามแล้ว</option>
+              <option value="bundle">ชุดเอกสารครบชุด — ทุกส่วน</option>
+              <option value="bundle-common">ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง</option>
+              <option value="bundle-attachments">ชุดเอกสารครบชุด — เอกสารแนบ</option>
+              <option value="bundle-draft-letter">ชุดเอกสารครบชุด — หนังสือ(ร่าง)</option>
+            </select>
+          </div>
+          <div class="cf-rule-help" id="delWarning" style="color:var(--red); display:none; font-weight:700;">
+            ⚠️ ฟิลด์นี้จำเป็นต่อการสร้างชื่อไฟล์ หากลบหรือซ่อน อาจทำให้สร้างชื่อไฟล์ไม่ได้ในบางกรณี
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn-ghost" type="button" id="cancelDelModalBtn">ยกเลิก</button>
+          <button class="btn-ghost solid" style="background:var(--red);" id="confirmDelBtn" type="button">ยืนยัน</button>
+        </div>
+      </div>
+    </div>
   `;
-  document.body.appendChild(modalWrap.querySelector('#fieldModal'));
+  document.body.appendChild(modalWrap);
+
+  /* ---------- Delete Modal Logic ---------- */
+  document.getElementById('delActionType').addEventListener('change', function(){
+    document.getElementById('delTargetWrap').style.display = this.value === 'hide' ? 'block' : 'none';
+  });
+  function closeDelModal(){ document.getElementById('deleteFieldModal').classList.remove('open'); }
+  document.getElementById('closeDelModalBtn').addEventListener('click', closeDelModal);
+  document.getElementById('cancelDelModalBtn').addEventListener('click', closeDelModal);
+
+  document.getElementById('confirmDelBtn').addEventListener('click', function(){
+    var id = document.getElementById('delFieldId').value;
+    var action = document.getElementById('delActionType').value;
+    var list = loadCustomFields();
+    var idx = list.findIndex(function(f){ return f.id === id; });
+    if(idx === -1) return;
+
+    var field = list[idx];
+
+    if(action === 'trash'){
+      list.splice(idx, 1);
+      saveCustomFields(list);
+      addToTrash(field);
+    } else {
+      // Changed to 'hide' -> just update the targetPage
+      field.targetPage = document.getElementById('delTargetPage').value;
+      saveCustomFields(list);
+    }
+
+    closeDelModal();
+    renderFieldsPage();
+    renderCustomFieldsInCreatePage();
+  });
 
   /* ---------- 3) Setup Page Host ---------- */
   var pageHost = document.getElementById('page-fields');
@@ -155,17 +210,19 @@
       </div>
       <div class="panel">
         <div class="cf-page-intro">
-          กำหนดฟิลด์กรอกข้อมูลในหน้า "ตั้งชื่อไฟล์เดี่ยว" ได้ทุกช่อง แก้ไขป้ายกำกับ ลบ/ซ่อน หรือกู้คืนฟิลด์ที่เคยลบไปแล้ว
-          ฟิลด์ที่มีป้าย <span class="cf-locked-badge" style="margin-left:0;">ล็อกโครงสร้าง</span> ผูกกับตรรกะการสร้างชื่อไฟล์ (เช่น ตัวเลือกในดรอปดาวน์) จึงแก้ไขได้เฉพาะป้ายกำกับ
-          และฟิลด์ที่มีป้าย <span class="cf-required-badge" style="margin-left:0;">จำเป็น</span> หากลบ/ซ่อน อาจทำให้สร้างชื่อไฟล์ไม่ได้ในบางกรณีจนกว่าจะกู้คืน
+          กำหนดฟิลด์กรอกข้อมูลในหน้าต่างๆ ได้ทุกช่อง แก้ไขป้ายกำกับ ลบ/ซ่อน หรือกู้คืนฟิลด์ที่เคยลบไปแล้ว<br>
+          ฟิลด์ที่มีป้าย <span class="cf-locked-badge" style="margin-left:0;">ล็อกโครงสร้าง</span> ผูกกับตรรกะการสร้างชื่อไฟล์ (เช่น ตัวเลือกในดรอปดาวน์) จึงไม่สามารถลบได้และแก้ไขได้เฉพาะป้ายกำกับ
         </div>
         <div class="cf-toolbar">
           <button class="btn-add-field" id="addFieldBtn" type="button">+ เพิ่มฟิลด์ใหม่</button>
         </div>
         <div id="adminFieldsList"></div>
         <div class="cf-empty" id="adminFieldsEmpty" style="display:none;">ยังไม่มีฟิลด์ในระบบ — กดปุ่ม "เพิ่มฟิลด์ใหม่" เพื่อเริ่มต้น</div>
+      </div>
 
-        <div class="cf-section-title">
+      <!-- แยกบล็อค ฟิลด์ที่ถูกลบ ตามความต้องการที่ 1 -->
+      <div class="panel" style="margin-top: 24px;">
+        <div class="cf-section-title" style="margin-top: 0;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/></svg>
           ฟิลด์ที่ถูกลบ (กู้คืนได้)
         </div>
@@ -177,13 +234,13 @@
 
   /* ---------- 4) Default System Fields & Storage ---------- */
   var defaultFields = [
-    /* --- ฟิลด์หลัก ที่ผูกกับโครงสร้างการสร้างชื่อไฟล์ (แก้ได้เฉพาะป้ายกำกับ) --- */
+    /* --- ฟิลด์หลัก ที่ผูกกับโครงสร้างการสร้างชื่อไฟล์ (ล็อกโครงสร้าง) --- */
     { id: 'sys_date',     label: 'วันที่ของเอกสาร',     targetPage: 'both', type: 'date',   isSystem: true, locked: true, required: true },
     { id: 'sys_doctype',  label: 'ประเภทเอกสาร',        targetPage: 'both', type: 'select', isSystem: true, locked: true, required: true },
     { id: 'sys_division', label: 'กอง / ศูนย์ / กลุ่ม',   targetPage: 'both', type: 'select', isSystem: true, locked: true, required: true },
     { id: 'sys_dept',     label: 'กลุ่มงาน / ฝ่าย',       targetPage: 'both', type: 'select', isSystem: true, locked: true, required: false },
     { id: 'sys_category', label: 'หมวดหมู่เรื่อง',       targetPage: 'both', type: 'select', isSystem: true, locked: true, required: false },
-    /* --- ฟิลด์ข้อความ แก้ไขได้เต็มรูปแบบเหมือนฟิลด์เพิ่มเติมทั่วไป --- */
+    /* --- ฟิลด์ข้อความ แก้ไข/ลบ/ซ่อน ได้ (ไม่ล็อคโครงสร้าง) --- */
     { id: 'sys_mdes',     label: 'รหัสส่วนราชการ',      targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 0, isSystem: true, locked: false, required: false },
     { id: 'sys_order',    label: 'ลำดับหนังสือส่งออก',  targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 0, isSystem: true, locked: false, required: false },
     { id: 'sys_letterno', label: 'เลขที่หนังสือส่งออก',  targetPage: 'both', type: 'text', inputMode: 'any', maxDigits: 0, maxLetters: 0, isSystem: true, locked: false, required: false },
@@ -228,8 +285,6 @@
     }
     try{
       var list = JSON.parse(raw).map(normalizeField);
-      // คืนค่าฟิลด์ระบบเดิม/ใหม่ที่ยังไม่เคยมีในรายการเพียงครั้งเดียวต่อรุ่น
-      // หลังจาก migration แล้ว ผู้ใช้ยังสามารถลบฟิลด์ระบบจากหน้าจัดการได้ตามปกติ
       if(!localStorage.getItem(MIGRATION_FLAG)){
         defaultFields.forEach(function(def){
           if(!list.some(function(f){ return f.id === def.id; })){
@@ -311,7 +366,16 @@
     if(!list.length){ wrap.innerHTML=''; if(empty) empty.style.display='block'; renderTrashSection(); return; }
     if(empty) empty.style.display='none';
 
-    var targetText = { 'both': 'ทั้งสองหน้า', 'single': 'ไฟล์เดี่ยว', 'bundle': 'เอกสารครบชุด' };
+    var targetText = { 
+      'both': 'ทั้งสองหน้า', 
+      'single': 'ไฟล์เดี่ยว (ทุกประเภท)', 
+      'single-draft': 'ไฟล์เดี่ยว (ร่าง)', 
+      'single-signed': 'ไฟล์เดี่ยว (ลงนาม)',
+      'bundle': 'ชุดเอกสาร (ทุกส่วน)',
+      'bundle-common': 'ชุดเอกสาร (ส่วนกลาง)',
+      'bundle-attachments': 'ชุดเอกสาร (เอกสารแนบ)',
+      'bundle-draft-letter': 'ชุดเอกสาร (ร่างหนังสือ)'
+    };
 
     wrap.innerHTML = list.map(function(f){
       return `
@@ -320,14 +384,14 @@
           <div>
             <span class="cf-card-title">${escapeHtml(f.label)}</span>
              <span class="cf-card-type">${fieldTypeLabel(f)}</span>
-            <span class="cf-card-target">${targetText[f.targetPage || 'both']}</span>
+            <span class="cf-card-target">${targetText[f.targetPage || 'both'] || 'ปรับแต่งแล้ว'}</span>
              ${f.isSystem?'<span class="cf-system-badge">ฟิลด์ระบบ</span>':''}
              ${f.required?'<span class="cf-required-badge">จำเป็น</span>':''}
              ${f.locked?'<span class="cf-locked-badge">ล็อกโครงสร้าง</span>':''}
           </div>
           <div class="cf-card-actions">
             <button data-edit="${f.id}" type="button">แก้ไข</button>
-            <button data-del="${f.id}" class="danger" type="button">ลบ</button>
+            ${!f.locked ? `<button data-del="${f.id}" class="danger" type="button">ลบ</button>` : ''}
           </div>
         </div>
         ${f.type==='select'?`<div class="cf-options-wrap">${(f.options||[]).map(function(o){return `<span class="cf-chip">${escapeHtml(o)}</span>`;}).join('')||'<span class="cf-chip">ยังไม่มีตัวเลือก</span>'}</div>`:''}
@@ -338,23 +402,26 @@
     wrap.querySelectorAll('[data-edit]').forEach(function(btn){
       btn.addEventListener('click', function(){ openFieldModal(btn.dataset.edit); });
     });
+    
+    // ผูก Event ปุ่มลบ ไปยัง Delete Modal (Goal 2)
     wrap.querySelectorAll('[data-del]').forEach(function(btn){
       btn.addEventListener('click', function(){
         var field = list.find(function(f){ return f.id === btn.dataset.del; });
         if(!field) return;
-        var message;
+
+        document.getElementById('delFieldId').value = field.id;
+        document.getElementById('delFieldName').textContent = field.label;
+        document.getElementById('delActionType').value = 'trash';
+        document.getElementById('delTargetWrap').style.display = 'none';
+        document.getElementById('delTargetPage').value = field.targetPage || 'both';
+
         if(field.required){
-          message = '⚠️ ฟิลด์นี้จำเป็นต่อการสร้างชื่อไฟล์ หากลบ (ซ่อน) ระบบอาจไม่สามารถสร้างชื่อไฟล์ได้ในบางกรณี จนกว่าจะกู้คืนจากถังฟิลด์ที่ถูกลบ ต้องการลบหรือไม่?';
-        } else if(field.isSystem){
-          message = 'ฟิลด์นี้เป็นฟิลด์เริ่มต้นของระบบ หากลบแล้วจะถูกซ่อนจากหน้าตั้งชื่อไฟล์ (กู้คืนได้ภายหลังจากถังฟิลด์ที่ถูกลบ) ต้องการลบหรือไม่?';
+          document.getElementById('delWarning').style.display = 'block';
         } else {
-          message = 'ต้องการลบฟิลด์นี้หรือไม่? (กู้คืนได้ภายหลังจากถังฟิลด์ที่ถูกลบ)';
+          document.getElementById('delWarning').style.display = 'none';
         }
-        if(!confirm(message)) return;
-        saveCustomFields(loadCustomFields().filter(function(f){ return f.id !== btn.dataset.del; }));
-        addToTrash(field);
-        renderFieldsPage();
-        renderCustomFieldsInCreatePage();
+
+        document.getElementById('deleteFieldModal').classList.add('open');
       });
     });
 
@@ -446,14 +513,15 @@
       document.getElementById('cfLabel').value = f.label;
       document.getElementById('cfTargetPage').value = f.targetPage || 'both';
 
-      // ฟิลด์ระบบแสดงอยู่ในหน้าแบบฟอร์มเดิมอยู่แล้ว ไม่ต้องเลือกหน้าแสดงผล/ประเภทฟิลด์
-      targetRow.style.display = f.isSystem ? 'none' : '';
+      // ฟิลด์ระบบประเภทที่ไม่ถูกล็อก (เช่น ถึง/ผู้รับ) สามารถแก้ TargetPage ได้ (Goal 2) 
+      // แต่ไม่สามารถเปลี่ยน Type ได้ เพราะผูกกับ HTML พื้นฐาน
+      targetRow.style.display = f.locked ? 'none' : ''; 
       typeRow.style.display = f.isSystem ? 'none' : '';
 
       if(f.locked){
         lockedNote.style.display = 'block';
-        lockedNote.textContent = 'ฟิลด์นี้ผูกกับโครงสร้างการสร้างชื่อไฟล์ของระบบ (เช่น รายการตัวเลือกที่ตายตัว) จึงแก้ไขได้เฉพาะป้ายกำกับเท่านั้น สามารถลบ (ซ่อน) และกู้คืนได้ตามปกติ' +
-          (f.required ? ' ⚠️ ฟิลด์นี้จำเป็นต่อการสร้างชื่อไฟล์ หากซ่อนไว้ ระบบอาจสร้างชื่อไฟล์ไม่ได้ในบางกรณี' : '');
+        lockedNote.textContent = 'ฟิลด์นี้ผูกกับโครงสร้างการสร้างชื่อไฟล์ของระบบ (เช่น รายการตัวเลือกที่ตายตัว) จึงแก้ไขได้เฉพาะป้ายกำกับเท่านั้น' +
+          (f.required ? ' ⚠️ ฟิลด์นี้จำเป็นต่อการสร้างชื่อไฟล์' : '');
         document.getElementById('cfOptionsBlock').style.display = 'none';
         document.getElementById('cfRulesBlock').style.display = 'none';
       } else {
@@ -500,50 +568,41 @@
       if(!f) return;
       f.label = label;
 
-      // ฟิลด์ที่ล็อกโครงสร้าง (select/date ที่ผูกกับตรรกะสร้างชื่อไฟล์) แก้ได้แค่ป้ายกำกับ
       if(f.locked && f.type === 'select'){
-
-  var lockedOptions =
-    Array.from(
-      document.querySelectorAll('#cfOptionsList input')
-    )
-    .map(function(input){
-      return input.value.trim();
-    })
-    .filter(Boolean);
-
-  if(!lockedOptions.length){
-
-    alert(
-      'กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับ Dropdown'
-    );
-
-    return;
-  }
-
-  f.options = lockedOptions;
-}
+        var lockedOptions = Array.from(document.querySelectorAll('#cfOptionsList input'))
+            .map(function(input){ return input.value.trim(); }).filter(Boolean);
+        if(!lockedOptions.length){
+          alert('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับ Dropdown');
+          return;
+        }
+        f.options = lockedOptions;
+      }
+      
+      // ถ้าฟิลด์ไม่ได้ล็อก สามารถแก้ไข targetPage และกฎการกรอกได้ (Goal 3)
       if(!f.locked){
         var targetPage = document.getElementById('cfTargetPage').value;
-        var type = document.getElementById('cfType').value;
         var inputMode = document.getElementById('cfInputMode').value;
         var maxDigits = parseInt(document.getElementById('cfMaxDigits').value, 10) || 0;
         var maxLetters = parseInt(document.getElementById('cfMaxLetters').value, 10) || 0;
 
-        var options = [];
-        if(type === 'select'){
-          options = Array.from(document.querySelectorAll('#cfOptionsList input'))
-                         .map(function(i){ return i.value.trim(); })
-                         .filter(Boolean);
-          if(!options.length){ alert('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับฟิลด์แบบ Dropdown'); return; }
-        }
-
-        if(!f.isSystem) f.targetPage = targetPage;
-        f.type = type;
-        f.options = options;
+        f.targetPage = targetPage;
         f.inputMode = inputMode;
         f.maxDigits = maxDigits;
         f.maxLetters = maxLetters;
+
+        // ไม่ให้แก้ Type หากเป็นฟิลด์ระบบ
+        if(!f.isSystem) {
+          var type = document.getElementById('cfType').value;
+          var options = [];
+          if(type === 'select'){
+            options = Array.from(document.querySelectorAll('#cfOptionsList input'))
+                           .map(function(i){ return i.value.trim(); })
+                           .filter(Boolean);
+            if(!options.length){ alert('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับฟิลด์แบบ Dropdown'); return; }
+          }
+          f.type = type;
+          f.options = options;
+        }
       }
     } else {
       var targetPage2 = document.getElementById('cfTargetPage').value;
@@ -614,6 +673,10 @@
     var present = {};
     list.forEach(function(f){ if(f.isSystem) present[f.id] = f; });
 
+    // ตรวจสอบโหมดปัจจุบัน (Single/Bundle) เพื่อซ่อนฟิลด์ระบบตามตั้งค่า TargetPage
+    var activeModeTab = document.querySelector('.mode-tab.active');
+    var currentMode = activeModeTab ? activeModeTab.dataset.mode : 'single'; // 'single' หรือ 'set'
+
     Object.keys(systemFieldBindings).forEach(function(id){
       var binding = systemFieldBindings[id];
       var input = document.getElementById(binding.inputId);
@@ -621,13 +684,26 @@
       var f = present[id];
 
       if(f){
-        // ใช้คลาส CSS (!important) แทนการเซ็ต style.display ตรงๆ
-        // เพื่อไม่ให้ถูกโค้ดหลักของหน้าฟอร์ม (เช่น การสลับโหมดหนังสือ/บันทึก) เขียนทับสถานะซ่อนทีหลัง
-        if(host) host.classList.remove('cf-field-removed');
-        applyInputRules(input, f);
-        var label = (input && input.closest('.field') && input.closest('.field').querySelector('label')) ||
-                    (host && host.querySelector('label'));
-        if(label && label.firstChild) label.firstChild.nodeValue = f.label + ' ';
+        var page = f.targetPage || 'both';
+        var shouldShow = true;
+
+        if (currentMode === 'single' && page.startsWith('bundle')) {
+            shouldShow = false;
+        } else if (currentMode === 'set' && page.startsWith('single')) {
+            shouldShow = false;
+        }
+
+        if (shouldShow) {
+          if(host) host.classList.remove('cf-field-removed');
+          applyInputRules(input, f);
+          var label = (input && input.closest('.field') && input.closest('.field').querySelector('label')) ||
+                      (host && host.querySelector('label'));
+          if(label && label.firstChild && label.firstChild.nodeType === 3) {
+             label.firstChild.nodeValue = f.label + ' ';
+          }
+        } else {
+          if(host) host.classList.add('cf-field-removed');
+        }
       } else {
         if(host) host.classList.add('cf-field-removed');
       }
@@ -635,170 +711,65 @@
   }
 
   function renderCustomFieldsInCreatePage(){
+    var containers = document.querySelectorAll('#customFieldsContainer, .customFieldsContainer');
+    if(!containers.length) return;
 
-  var containers = document.querySelectorAll(
-    '#customFieldsContainer, .customFieldsContainer'
-  );
+    var list = loadCustomFields();
+    applySystemFieldSettings(list);
 
-  if(!containers.length) return;
+    containers.forEach(function(container){
+      var target = container.dataset.cfTarget || 'single';
+      var filteredList = list.filter(function(f){
+        if(f.isSystem) return false;
+        var page = f.targetPage || 'both';
+        
+        if(page === 'both') return true;
+        if(page === 'single') return target === 'single';
+        if(page === 'single-draft') return target === 'single-draft';
+        if(page === 'single-signed') return target === 'single-signed';
+        
+        if(page === 'bundle'){
+          return (target === 'bundle-common' || target === 'bundle-attachments' || target === 'bundle-draft-letter');
+        }
+        if(page === 'bundle-common') return target === 'bundle-common';
+        if(page === 'bundle-attachments') return target === 'bundle-attachments';
+        if(page === 'bundle-draft-letter') return target === 'bundle-draft-letter';
+        
+        return false;
+      });
 
-  var list = loadCustomFields();
-
-  applySystemFieldSettings(list);
-
-
-  containers.forEach(function(container){
-
-    var target = container.dataset.cfTarget || 'single';
-
-
-    var filteredList = list.filter(function(f){
-
-      /* ฟิลด์ระบบไม่สร้างซ้ำ */
-      if(f.isSystem) return false;
-
-
-      var page = f.targetPage || 'both';
-
-
-      /* แสดงทุกส่วนของระบบ */
-      if(page === 'both'){
-        return true;
+      if(!filteredList.length){
+        container.innerHTML = '';
+        return;
       }
 
+      container.innerHTML = '<div class="field-grid2"></div>';
+      var grid = container.querySelector('.field-grid2');
 
-      /* ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท */
-      if(page === 'single'){
-        return target === 'single';
-      }
-
-
-      /* ร่างหนังสือ */
-      if(page === 'single-draft'){
-        return target === 'single-draft';
-      }
-
-
-      /* หนังสือลงนามแล้ว */
-      if(page === 'single-signed'){
-        return target === 'single-signed';
-      }
-
-
-      /* ชุดเอกสารครบชุด — ทุกส่วน */
-      if(page === 'bundle'){
-        return (
-          target === 'bundle-common' ||
-          target === 'bundle-attachments' ||
-          target === 'bundle-draft-letter'
-        );
-      }
-
-
-      /* ชุดเอกสาร — ข้อมูลส่วนกลาง */
-      if(page === 'bundle-common'){
-        return target === 'bundle-common';
-      }
-
-
-      /* ชุดเอกสาร — เอกสารแนบ */
-      if(page === 'bundle-attachments'){
-        return target === 'bundle-attachments';
-      }
-
-
-      /* ชุดเอกสาร — หนังสือ(ร่าง) */
-      if(page === 'bundle-draft-letter'){
-        return target === 'bundle-draft-letter';
-      }
-
-
-      return false;
-
+      filteredList.forEach(function(f){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        if(f.type === 'select'){
+          wrap.innerHTML = `
+            <label>${escapeHtml(f.label)}<span style="font-weight:400;color:var(--ink-300);"> (ไม่บังคับ)</span></label>
+            <select id="cf-input-${f.id}">
+              <option value="">— เลือก ${escapeHtml(f.label)} —</option>
+              ${(f.options || []).map(function(option){
+                return `<option value="${escapeHtml(option)}">${escapeHtml(option)}</option>`;
+              }).join('')}
+            </select>
+          `;
+        } else {
+          wrap.innerHTML = `
+            <label>${escapeHtml(f.label)}<span style="font-weight:400;color:var(--ink-300);"> (ไม่บังคับ)</span></label>
+            <input type="text" id="cf-input-${f.id}" placeholder="ระบุ${escapeHtml(f.label)}">
+          `;
+        }
+        grid.appendChild(wrap);
+        applyInputRules(wrap.querySelector('input'), f);
+      });
     });
-
-
-    if(!filteredList.length){
-
-      container.innerHTML = '';
-
-      return;
-
-    }
-
-
-    container.innerHTML = '<div class="field-grid2"></div>';
-
-    var grid = container.querySelector('.field-grid2');
-
-
-    filteredList.forEach(function(f){
-
-      var wrap = document.createElement('div');
-
-      wrap.className = 'field';
-
-
-      if(f.type === 'select'){
-
-        wrap.innerHTML = `
-          <label>
-            ${escapeHtml(f.label)}
-            <span style="font-weight:400;color:var(--ink-300);">
-              (ไม่บังคับ)
-            </span>
-          </label>
-
-          <select id="cf-input-${f.id}">
-            <option value="">
-              — เลือก ${escapeHtml(f.label)} —
-            </option>
-
-            ${(f.options || []).map(function(option){
-
-              return `
-                <option value="${escapeHtml(option)}">
-                  ${escapeHtml(option)}
-                </option>
-              `;
-
-            }).join('')}
-
-          </select>
-        `;
-
-      } else {
-
-        wrap.innerHTML = `
-          <label>
-            ${escapeHtml(f.label)}
-            <span style="font-weight:400;color:var(--ink-300);">
-              (ไม่บังคับ)
-            </span>
-          </label>
-
-          <input
-            type="text"
-            id="cf-input-${f.id}"
-            placeholder="ระบุ${escapeHtml(f.label)}"
-          >
-        `;
-
-      }
-
-
-      grid.appendChild(wrap);
-
-      applyInputRules(
-        wrap.querySelector('input'),
-        f
-      );
-
-    });
-
-  });
-
-}
+  }
 
   function getCustomFieldValues(){
     return loadCustomFields().map(function(f){
@@ -831,8 +802,9 @@
     renderCustomFieldsInCreatePage();
   }
 
+  // Refresh dynamic fields UI anytime a tab/mode is clicked (Goal 2)
   document.addEventListener('click', function(e){
-    if(e.target.closest('.nav-item') || e.target.closest('[data-page]')){
+    if(e.target.closest('.nav-item') || e.target.closest('[data-page]') || e.target.closest('.mode-tab') || e.target.closest('.doc-sub-tab')){
       setTimeout(function(){
         renderCustomFieldsInCreatePage();
         if(document.querySelector('#page-fields.active')){
