@@ -44,7 +44,12 @@
   document.head.appendChild(style);
 
   /* ---------- 2) Inject Field Modals ---------- */
+  // เช็คและลบ Modal เก่าทิ้งก่อนเพื่อป้องกัน ID ซ้ำซ้อน
+  var oldModals = document.getElementById('cf-injected-modals');
+  if(oldModals) oldModals.remove();
+
   var modalWrap = document.createElement('div');
+  modalWrap.id = 'cf-injected-modals'; // กำหนด ID ให้ตัวคุมทั้งหมด
   modalWrap.innerHTML = `
     <!-- แก้ไข/เพิ่ม ฟิลด์ Modal -->
     <div class="modal-overlay" id="fieldModal">
