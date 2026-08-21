@@ -66,10 +66,39 @@
           <div class="field" id="cfTargetPageRow" style="margin-bottom:14px;">
             <label>แสดงผลในหน้าใด</label>
             <select id="cfTargetPage">
-              <option value="both">แสดงทั้งสองหน้า (ไฟล์เดี่ยว & เอกสารครบชุด)</option>
-              <option value="single">ตั้งไฟล์เดี่ยว เท่านั้น</option>
-              <option value="bundle">เอกสารครบชุด เท่านั้น</option>
-            </select>
+            <option value="both">
+            ทุกส่วนของระบบ
+            </option>
+
+            <option value="single">
+            ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท
+            </option>
+
+            <option value="single-draft">
+            ตั้งชื่อไฟล์เดี่ยว — ร่างหนังสือ
+            </option>
+
+            <option value="single-signed">
+            ตั้งชื่อไฟล์เดี่ยว — หนังสือลงนามแล้ว
+            </option>
+
+            <option value="bundle">
+            ชุดเอกสารครบชุด — ทุกส่วน
+            </option>
+
+            <option value="bundle-common">
+            ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง
+            </option>
+
+            <option value="bundle-attachments">
+            ชุดเอกสารครบชุด — เอกสารแนบ
+            </option>
+
+            <option value="bundle-draft-letter">
+            ชุดเอกสารครบชุด — หนังสือ(ร่าง)
+            </option>
+
+          </select>
           </div>
           <div class="field" id="cfTypeRow" style="margin-bottom:14px;">
             <label>ประเภทฟิลด์</label>
@@ -472,6 +501,28 @@
       f.label = label;
 
       // ฟิลด์ที่ล็อกโครงสร้าง (select/date ที่ผูกกับตรรกะสร้างชื่อไฟล์) แก้ได้แค่ป้ายกำกับ
+      if(f.locked && f.type === 'select'){
+
+  var lockedOptions =
+    Array.from(
+      document.querySelectorAll('#cfOptionsList input')
+    )
+    .map(function(input){
+      return input.value.trim();
+    })
+    .filter(Boolean);
+
+  if(!lockedOptions.length){
+
+    alert(
+      'กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับ Dropdown'
+    );
+
+    return;
+  }
+
+  f.options = lockedOptions;
+}
       if(!f.locked){
         var targetPage = document.getElementById('cfTargetPage').value;
         var type = document.getElementById('cfType').value;
@@ -584,15 +635,224 @@
   }
 
   function renderCustomFieldsInCreatePage(forcedPageType){
-    var currentPage = forcedPageType;
-    if(!currentPage){
-      var activePageEl = document.querySelector('.page.active');
-      if(activePageEl){
-        var id = activePageEl.id || '';
-        if(id.includes('single') || id.includes('create')) currentPage = 'single';
-        else if(id.includes('bundle') || id.includes('batch')) currentPage = 'bundle';
-      }
+
+  var containers =
+    document.querySelectorAll(
+      '#customFieldsContainer, .customFieldsContainer'
+    );
+
+  if(!containers.length) return;
+
+  var list = loadCustomFields();
+
+  applySystemFieldSettings(list);
+
+
+  containers.forEach(function(container){
+
+    var target =
+      container.dataset.cfTarget || 'single';
+
+
+    var filteredList =
+      list.filter(function(f){
+
+        /* ฟิลด์ระบบไม่สร้างซ้ำ */
+
+        if(f.isSystem){
+          return false;
+        }
+
+
+        var page =
+          f.targetPage || 'both';
+
+
+        /* แสดงทุกส่วน */
+
+        if(page === 'both'){
+          return true;
+        }
+
+
+        /* ไฟล์เดี่ยวทุกประเภท */
+
+        if(page === 'single'){
+          return (
+            target === 'single'
+          );
+        }
+
+
+        /* ร่างหนังสือ */
+
+        if(page === 'single-draft'){
+          return (
+            target === 'single-draft'
+          );
+        }
+
+
+        /* หนังสือลงนามแล้ว */
+
+        if(page === 'single-signed'){
+          return (
+            target === 'single-signed'
+          );
+        }
+
+
+        /* ชุดเอกสารทุกส่วน */
+
+        if(page === 'bundle'){
+
+          return (
+            target === 'bundle-common' ||
+            target === 'bundle-attachments' ||
+            target === 'bundle-draft-letter'
+          );
+
+        }
+
+
+        /* ข้อมูลส่วนกลาง */
+
+        if(page === 'bundle-common'){
+          return (
+            target === 'bundle-common'
+          );
+        }
+
+
+        /* เอกสารแนบ */
+
+        if(page === 'bundle-attachments'){
+          return (
+            target === 'bundle-attachments'
+          );
+        }
+
+
+        /* หนังสือร่าง */
+
+        if(page === 'bundle-draft-letter'){
+          return (
+            target === 'bundle-draft-letter'
+          );
+        }
+
+
+        return false;
+
+      });
+
+
+    if(!filteredList.length){
+
+      container.innerHTML = '';
+
+      return;
     }
+
+
+    container.innerHTML =
+      '<div class="field-grid2"></div>';
+
+
+    var grid =
+      container.querySelector(
+        '.field-grid2'
+      );
+
+
+    filteredList.forEach(function(f){
+
+      var wrap =
+        document.createElement('div');
+
+
+      wrap.className = 'field';
+
+
+      if(f.type === 'select'){
+
+        wrap.innerHTML = `
+
+          <label>
+            ${escapeHtml(f.label)}
+            <span
+              style="
+                font-weight:400;
+                color:var(--ink-300);
+              "
+            >
+              (ไม่บังคับ)
+            </span>
+          </label>
+
+          <select id="cf-input-${f.id}">
+
+            <option value="">
+              — เลือก ${escapeHtml(f.label)} —
+            </option>
+
+            ${(f.options || [])
+              .map(function(option){
+
+                return `
+                  <option
+                    value="${escapeHtml(option)}"
+                  >
+                    ${escapeHtml(option)}
+                  </option>
+                `;
+
+              })
+              .join('')
+            }
+
+          </select>
+        `;
+
+      }else{
+
+        wrap.innerHTML = `
+
+          <label>
+            ${escapeHtml(f.label)}
+            <span
+              style="
+                font-weight:400;
+                color:var(--ink-300);
+              "
+            >
+              (ไม่บังคับ)
+            </span>
+          </label>
+
+          <input
+            type="text"
+            id="cf-input-${f.id}"
+            placeholder="ระบุ${escapeHtml(f.label)}"
+          >
+        `;
+
+      }
+
+
+      grid.appendChild(wrap);
+
+
+      applyInputRules(
+        wrap.querySelector('input'),
+        f
+      );
+
+    });
+
+  });
+
+}
 
     var containers = document.querySelectorAll('#customFieldsContainer, .customFieldsContainer');
     if(!containers.length) return;

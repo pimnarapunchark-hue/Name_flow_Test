@@ -592,6 +592,11 @@
                 <small style="font-size:11px;color:var(--ink-500);margin-top:4px;display:block;">เลขที่หนังสือหลังลงนาม</small>
               </div>
             </div>
+            <!-- ฟิลด์เพิ่มเติมสำหรับร่างหนังสือ -->
+            <div class="customFieldsContainer" data-cf-target="single-draft"></div>
+
+            <!-- ฟิลด์เพิ่มเติมสำหรับหนังสือลงนามแล้ว -->
+            <div class="customFieldsContainer" data-cf-target="single-signed"></div>
           </div>
 
           <!-- Row 2: หมวดหมู่เรื่อง / ชื่อเรื่อง -->
@@ -683,7 +688,7 @@
             </div>
           </div>
 
-          <div id="customFieldsContainer"></div>
+          <div id="customFieldsContainer"ata-cf-target="single"></div>
 
           <button class="btn-create" id="genBtn">สร้างชื่อไฟล์ ✦</button>
 
@@ -718,7 +723,7 @@
             </div>
 
             <div class="set-section">
-              <div class="set-section-title">ข้อมูลส่วนกลาง</div>
+              <div class="set-section-title">ข้อมูลส่วนกลาง<div class="customFieldsContainer"data-cf-target="bundle-common"></div></div>
               <div class="field-grid2">
                 <div class="field">
                   <label>วันที่ของเอกสาร</label>
@@ -781,11 +786,12 @@
             <div class="set-section">
               <div class="set-section-title">เอกสารแนบ</div>
               <div id="setAttachList"></div>
-              <button class="btn-add-attach" id="addAttachBtn" type="button">+ เพิ่มเอกสารแนบ</button>
-            </div>
+            <button class="btn-add-attach" id="addAttachBtn"type="button">+ เพิ่มเอกสารแนบ</button>
+            <!-- ฟิลด์เพิ่มเติม -->
+            <div class="customFieldsContainer"data-cf-target="bundle-attachments"></div></div>
 
             <div class="set-section">
-              <div class="set-section-title">หนังสือ(ร่าง)</div>
+              <div class="set-section-title">หนังสือ(ร่าง)<div class="customFieldsContainer" data-cf-target="bundle-draft-letter"></div></div>
               <div class="field-grid2">
                 <div class="field">
                   <label>รหัสส่วนราชการ</label>
