@@ -270,6 +270,21 @@
     sys_signer:   { inputId: 'f-signer',    fieldId: 'field-signer' }
   };
 
+  /* ผูกฟิลด์ระบบกับช่องกรอกในหน้า "ชุดเอกสารครบชุด" (set-*) ด้วย
+     เพื่อให้การแก้ไขป้ายกำกับ / ลบ / ซ่อน / กติกาการกรอก มีผลกับหน้า set ด้วย
+     (ฟิลด์ที่ไม่มีช่องเทียบในหน้า set เช่น ประเภทเอกสาร หมวดหมู่ เลขที่หนังสือส่งออก จะไม่ผูก) */
+  var bundleFieldBindings = {
+    sys_date:     { inputIds: ['set-date'] },
+    sys_division: { inputIds: ['set-division'] },
+    sys_dept:     { inputIds: ['set-dept'] },
+    sys_session:  { inputIds: ['set-session'] },
+    sys_mdes:     { inputIds: ['set-mdes'] },
+    sys_order:    { inputIds: ['set-order'] },
+    sys_to:       { inputIds: ['set-memo-to', 'set-letter-to'] },
+    sys_signer:   { inputIds: ['set-memo-signer', 'set-letter-signer'] },
+    sys_title:    { inputIds: ['set-memo-title', 'set-letter-title'] }
+  };
+
   var MIGRATION_FLAG = 'system_fields_migrated_v4';
 
   function normalizeField(f){
@@ -573,14 +588,11 @@
       if(!f) return;
       f.label = label;
 
+      // ฟิลด์ล็อกโครงสร้าง (Dropdown ผูกตรรกะ): แก้ไขได้เฉพาะป้ายกำกับ
+      // ตัวเลือกถูกซ่อนไว้ใน Modal และคงค่าเดิมไว้ (เดิมโค้ดพยายามอ่านตัวเลือกจากกล่องที่ซ่อน
+      // ซึ่งว่างเสมอ → บันทึกป้ายกำกับไม่ได้เลย)
       if(f.locked && f.type === 'select'){
-        var lockedOptions = Array.from(document.querySelectorAll('#cfOptionsList input'))
-            .map(function(input){ return input.value.trim(); }).filter(Boolean);
-        if(!lockedOptions.length){
-          alert('กรุณาเพิ่มตัวเลือกอย่างน้อย 1 รายการสำหรับ Dropdown');
-          return;
-        }
-        f.options = lockedOptions;
+        // คง f.options เดิมไว้ — ไม่ต้องทำอะไร
       }
       
       // ถ้าฟิลด์ไม่ได้ล็อก สามารถแก้ไข targetPage และกฎการกรอกได้ (Goal 3)
@@ -682,37 +694,46 @@
     var activeModeTab = document.querySelector('.mode-tab.active');
     var currentMode = activeModeTab ? activeModeTab.dataset.mode : 'single'; // 'single' หรือ 'set'
 
-    Object.keys(systemFieldBindings).forEach(function(id){
-      var binding = systemFieldBindings[id];
-      var input = document.getElementById(binding.inputId);
-      var host = binding.fieldId ? document.getElementById(binding.fieldId) : (input && input.closest('.field'));
+    function applyBinding(id, binding){
       var f = present[id];
+      var inputIds = binding.inputIds || [binding.inputId];
 
-      if(f){
-        var page = f.targetPage || 'both';
-        var shouldShow = true;
+      inputIds.forEach(function(inputId){
+        var input = document.getElementById(inputId);
+        // host = กล่องที่ครอบฟิลด์ (ใช้ fieldId ที่ผูกไว้ ถ้าไม่มีใน HTML ก็ใช้ closest('.field'))
+        var host = (binding.fieldId && document.getElementById(binding.fieldId)) || (input && input.closest('.field'));
 
-        if (currentMode === 'single' && page.startsWith('bundle')) {
+        if(f){
+          var page = f.targetPage || 'both';
+          var shouldShow = true;
+
+          if (currentMode === 'single' && page.startsWith('bundle')) {
             shouldShow = false;
-        } else if (currentMode === 'set' && page.startsWith('single')) {
+          } else if (currentMode === 'set' && page.startsWith('single')) {
             shouldShow = false;
-        }
+          }
 
-        if (shouldShow) {
-          if(host) host.classList.remove('cf-field-removed');
-          applyInputRules(input, f);
-          var label = (input && input.closest('.field') && input.closest('.field').querySelector('label')) ||
-                      (host && host.querySelector('label'));
-          if(label && label.firstChild && label.firstChild.nodeType === 3) {
-             label.firstChild.nodeValue = f.label + ' ';
+          if (shouldShow) {
+            if(host) host.classList.remove('cf-field-removed');
+            applyInputRules(input, f);
+            var label = (input && input.closest('.field') && input.closest('.field').querySelector('label')) ||
+                        (host && host.querySelector('label'));
+            if(label && label.firstChild && label.firstChild.nodeType === 3) {
+               label.firstChild.nodeValue = f.label + ' ';
+            }
+          } else {
+            if(host) host.classList.add('cf-field-removed');
           }
         } else {
+          // ฟิลด์ถูกลบจากระบบ → ซ่อนช่องที่ผูกไว้ทุกหน้า
           if(host) host.classList.add('cf-field-removed');
         }
-      } else {
-        if(host) host.classList.add('cf-field-removed');
-      }
-    });
+      });
+    }
+
+    // ใช้กับทั้งหน้าไฟล์เดี่ยว (f-*) และหน้าชุดเอกสารครบชุด (set-*)
+    Object.keys(systemFieldBindings).forEach(function(id){ applyBinding(id, systemFieldBindings[id]); });
+    Object.keys(bundleFieldBindings).forEach(function(id){ applyBinding(id, bundleFieldBindings[id]); });
   }
 
   function renderCustomFieldsInCreatePage(){
