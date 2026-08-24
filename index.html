@@ -302,6 +302,80 @@
   .dept-custom-wrap.show{display:block;}
   .dept-custom-wrap input{width:100%;padding:10px 13px;border:1.5px solid var(--teal-500);border-radius:9px;font-size:13.5px;color:var(--ink-900);background:#fff;outline:none;box-shadow:0 0 0 3px var(--teal-100);}
 
+  /* HOME DASHBOARD */
+.home-card{
+  align-items:stretch;
+  justify-content:flex-start;
+  text-align:left;
+  min-height:0;
+}
+
+.home-hero{
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+}
+
+.home-menu-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:10px;
+}
+
+.home-menu-btn{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:16px;
+  text-align:left;
+  cursor:pointer;
+  transition:.15s;
+  box-shadow:var(--shadow-sm);
+}
+
+.home-menu-btn:hover{
+  border-color:var(--teal-500);
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-md);
+}
+
+.home-menu-btn b{
+  display:block;
+  font-size:13px;
+  color:var(--ink-900);
+  margin-bottom:4px;
+}
+
+.home-menu-btn span{
+  font-size:11.5px;
+  color:var(--ink-500);
+  line-height:1.5;
+}
+
+.home-stats{
+  justify-content:center;
+  gap:14px;
+  width:100%;
+  margin-top:4px;
+}
+
+.home-stat{
+  flex:1;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px 10px;
+}
+
+@media(max-width:900px){
+  .home-menu-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
   @media (max-width:900px){
     #authView{height:auto;min-height:100vh;overflow:visible;}
     .auth-brand{display:none;}
@@ -470,23 +544,140 @@
 
     <div class="main">
       <!-- HOME -->
-      <div class="page active" id="page-home">
-        <div class="home-card">
-          <div class="home-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
-          </div>
-          <div class="home-title" id="homeWelcome">ยินดีต้อนรับสู่ระบบช่วยตั้งชื่อไฟล์หนังสือราชการ</div>
-          <div class="home-sub">ตั้งชื่อไฟล์เอกสารราชการให้ถูกต้องตามมาตรฐาน สป.ดศ. ครบ ชัดเจน และค้นหาง่าย ภายในไม่กี่ขั้นตอน</div>
-          <button class="btn-primary" id="goCreateBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 5v14M5 12h14"/></svg>
-            คลิกเพื่อสร้างชื่อไฟล์
-          </button>
-          <div class="home-stats">
-            <div class="home-stat"><b id="statCount">0</b><span>ไฟล์ที่ตั้งชื่อแล้ว</span></div>
-            <div class="home-stat"><b>4</b><span>ขั้นตอนการใช้งาน</span></div>
-          </div>
-        </div>
+<div class="page active" id="page-home">
+
+  <div class="home-card">
+
+    <div class="home-hero">
+
+      <div class="home-logo">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
       </div>
+
+      <div
+        class="home-title"
+        id="homeWelcome"
+      >
+        ยินดีต้อนรับสู่ระบบช่วยตั้งชื่อไฟล์หนังสือราชการ
+      </div>
+
+      <div class="home-sub">
+        เลือกเมนูที่ต้องการใช้งานได้จากหน้านี้
+        หรือเริ่มสร้างชื่อไฟล์ได้ทันที
+      </div>
+
+      <button
+        class="btn-primary"
+        id="goCreateBtn"
+      >
+        คลิกเพื่อสร้างชื่อไฟล์
+      </button>
+
+    </div>
+
+
+    <!-- สถิติ -->
+    <div class="home-stats">
+
+      <div class="home-stat">
+        <b id="statCount">0</b>
+        <span>ไฟล์ที่ตั้งชื่อแล้ว</span>
+      </div>
+
+      <div class="home-stat">
+        <b id="statFieldCount">0</b>
+        <span>ฟิลด์ที่ใช้งานอยู่</span>
+      </div>
+
+      <div class="home-stat">
+        <b id="statMenuCount">6</b>
+        <span>เมนูในระบบ</span>
+      </div>
+
+    </div>
+
+
+    <!-- เมนูลัด -->
+    <div class="home-menu-grid">
+
+      <button
+        class="home-menu-btn"
+        data-page="create"
+      >
+        <b>ตั้งชื่อไฟล์</b>
+        <span>
+          สร้างชื่อไฟล์เดี่ยวหรือชุดเอกสารครบชุด
+        </span>
+      </button>
+
+
+      <button
+        class="home-menu-btn"
+        data-page="fields"
+      >
+        <b>จัดการฟิลด์เพิ่มเติม</b>
+        <span>
+          สร้าง แก้ไข กำหนดตำแหน่งและความบังคับของฟิลด์
+        </span>
+      </button>
+
+
+      <button
+        class="home-menu-btn"
+        data-page="history"
+      >
+        <b>ประวัติการตั้งชื่อไฟล์</b>
+        <span>
+          ค้นหาและย้อนดูชื่อไฟล์ที่เคยสร้าง
+        </span>
+      </button>
+
+
+      <button
+        class="home-menu-btn"
+        data-page="docs"
+      >
+        <b>วิธีการใช้งาน</b>
+        <span>
+          ดูขั้นตอนและโครงสร้างการตั้งชื่อไฟล์
+        </span>
+      </button>
+
+
+      <button
+        class="home-menu-btn"
+        data-page="admin"
+      >
+        <b>จัดการข้อความ</b>
+        <span>
+          สำหรับผู้ดูแลระบบในการจัดการข้อมูล
+        </span>
+      </button>
+
+
+      <button
+        class="home-menu-btn"
+        data-page="home"
+      >
+        <b>หน้าแรก</b>
+        <span>
+          ดูสถิติการใช้งานและทางลัดเมนูทั้งหมด
+        </span>
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
       <!-- CREATE -->
       <div class="page" id="page-create">
@@ -688,7 +879,7 @@
             </div>
           </div>
 
-          <div id="customFieldsContainer"ata-cf-target="single"></div>
+          <div id="customFieldsContainer"data-cf-target="single"></div>
 
           <button class="btn-create" id="genBtn">สร้างชื่อไฟล์ ✦</button>
 
@@ -723,7 +914,8 @@
             </div>
 
             <div class="set-section">
-              <div class="set-section-title">ข้อมูลส่วนกลาง<div class="customFieldsContainer"data-cf-target="bundle-common"></div></div>
+              <div class="set-section-title">ข้อมูลส่วนกลาง</div><div class="customFieldsContainer"data-cf-target="bundle-common"></div>
+
               <div class="field-grid2">
                 <div class="field">
                   <label>วันที่ของเอกสาร</label>
@@ -791,7 +983,7 @@
             <div class="customFieldsContainer"data-cf-target="bundle-attachments"></div></div>
 
             <div class="set-section">
-              <div class="set-section-title">หนังสือ(ร่าง)<div class="customFieldsContainer" data-cf-target="bundle-draft-letter"></div></div>
+              <div class="set-section-title">หนังสือ(ร่าง)</div><div class="customFieldsContainer"data-cf-target="bundle-draft-letter"></div>
               <div class="field-grid2">
                 <div class="field">
                   <label>รหัสส่วนราชการ</label>
@@ -869,57 +1061,543 @@
       </div>
 
       <!-- DOCS -->
-      <div class="page" id="page-docs">
-        <div class="doc-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M14 4v5h5"/></svg>
-          <h2>คู่มือการใช้งาน</h2>
-        </div>
-        <div class="doc-sub">แนวทางการตั้งชื่อไฟล์เอกสารหนังสือของสำนักงานปลัดกระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม (สำหรับกอง/ศูนย์/กลุ่ม)</div>
-        <div class="step-grid">
-          <div class="step-card">
-            <div class="step-num">1</div>
-            <div class="step-label">กรอกข้อมูลให้ครบ</div>
-            <div class="step-desc">ไปที่เมนู "ตั้งชื่อไฟล์" แล้วกรอก/เลือก:
-              <ul>
-                <li>วันที่ของเอกสาร (ปีพุทธศักราช)</li>
-                <li>กอง/ศูนย์/กลุ่ม — เจ้าของเรื่อง</li>
-                <li>กลุ่มงาน/ฝ่าย — ไม่บังคับ, เลือก "อื่นๆ" เพื่อกรอกเอง</li>
-                <li>หมวดหมู่เรื่อง — สำหรับอ้างอิง</li>
-                <li>ประเภทเอกสาร เช่น บันทึก หนังสือ แนบ</li>
-              </ul>
-            </div>
-          </div>
-          <div class="step-card">
-            <div class="step-num">2</div>
-            <div class="step-label">ระบุชื่อเรื่องและผู้รับ</div>
-            <div class="step-desc">กรอกช่อง "ชื่อเรื่อง" ให้สั้น กระชับ ได้ใจความ เช่น <i>เชิญประชุมผู้บริหาร สปดศ_1_67</i> และช่อง "ถึง" ระบุผู้รับ เช่น <i>ประธาน</i> — หากมีผู้มีอำนาจลงนามให้ระบุในช่อง "(S)"</div>
-          </div>
-          <div class="step-card">
-            <div class="step-num">3</div>
-            <div class="step-label">กดสร้างชื่อไฟล์</div>
-            <div class="step-desc">กดปุ่ม "สร้างชื่อไฟล์ ✦" ระบบจะรวมข้อมูลทั้งหมดเป็นชื่อไฟล์ตามโครงสร้างมาตรฐาน <b>โดยไม่มีนามสกุลไฟล์</b> (.pdf/.docx) ตามแนวทาง สป.ดศ.</div>
-          </div>
-          <div class="step-card">
-            <div class="step-num">4</div>
-            <div class="step-label">ตรวจสอบและเก็บประวัติ</div>
-            <div class="step-desc">ชื่อไฟล์ที่สร้างจะถูกบันทึกไว้อัตโนมัติในเมนู "ประวัติการตั้งชื่อไฟล์" ของบัญชีคุณ เพื่อย้อนดูหรืออ้างอิงได้ทุกเมื่อ</div>
-          </div>
-        </div>
-        <div class="arch-panel">
-          <h3>โครงสร้างชื่อไฟล์มาตรฐาน</h3>
-          <div class="arch-sub">ตามแนวทาง สป.ดศ. — ใช้ขีดล่าง (_) แทนการเว้นวรรค</div>
-          <div class="arch-code">ปีปฏิทิน_กอง_กลุ่มงาน_ประเภทเอกสาร_(Sผู้ลงนาม)_ชื่อเรื่อง_ถึง
-          <br><br>ตัวอย่าง :
-          <br>2567_กก_กอก_บันทึก_(S ผอ.กก.)_เชิญประชุมผู้บริหาร สปดศ_1_67_ประธาน
-          <br>2567_กก_กอก_แนบ1_วาระประชุมผู้บริหาร สปดศ_1_67</div>
-          <br>
-          <small style="color:var(--ink-500);">* กลุ่มงาน และผู้ลงนาม ไม่จำเป็นต้องระบุ *</small>
-          <a id="guidePdfDownload" class="btn-primary" download="แนวทางและตัวอย่างการตั้งชื่อไฟล์เอกสารหนังสือ.pdf" style="display:inline-flex;text-decoration:none;margin-top:14px;width:fit-content;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-            ดาวน์โหลดคู่มือ (PDF)
-          </a>
-        </div>
-      </div>
+      <!-- DOCS -->
+<div class="page" id="page-docs">
+
+  <div class="doc-header">
+
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path d="M4 4h11l5 5v11a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/>
+      <path d="M14 4v5h5"/>
+    </svg>
+
+    <h2>วิธีการใช้งานระบบ NAMEFLOW</h2>
+
+  </div>
+
+
+  <div class="doc-sub">
+    คู่มือการใช้งานระบบช่วยสร้างชื่อไฟล์เอกสาร
+    เพื่อให้ผู้ใช้งานสามารถกำหนดรูปแบบชื่อไฟล์ได้อย่างเป็นระบบ
+    ลดความผิดพลาด และจัดเก็บเอกสารได้ง่ายขึ้น
+  </div>
+
+
+
+  <!-- STEP 1 -->
+
+  <div class="arch-panel">
+
+    <h3>1. เริ่มต้นใช้งานระบบ</h3>
+
+    <div class="step-desc">
+
+      เมื่อเข้าสู่ระบบ ผู้ใช้งานจะพบกับหน้าแรกของระบบ
+      ซึ่งจะแสดงสถิติการใช้งานและเมนูสำหรับเข้าสู่ฟังก์ชันต่าง ๆ
+
+      <ul>
+
+        <li>
+          <b>ตั้งชื่อไฟล์</b>
+          สำหรับสร้างชื่อไฟล์เอกสาร
+        </li>
+
+        <li>
+          <b>จัดการฟิลด์</b>
+          สำหรับเพิ่ม แก้ไข หรือลบฟิลด์ที่ใช้ในการสร้างชื่อไฟล์
+        </li>
+
+        <li>
+          <b>ประวัติการตั้งชื่อไฟล์</b>
+          สำหรับดูชื่อไฟล์ที่เคยสร้างไว้
+        </li>
+
+        <li>
+          <b>วิธีการใช้งาน</b>
+          สำหรับดูคำแนะนำและขั้นตอนการใช้งานระบบ
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 2 -->
+
+  <div class="arch-panel">
+
+    <h3>2. การสร้างชื่อไฟล์</h3>
+
+    <div class="step-desc">
+
+      ระบบรองรับการสร้างชื่อไฟล์ 2 รูปแบบ ได้แก่
+
+      <ul>
+
+        <li>
+          <b>การสร้างชื่อไฟล์เดี่ยว</b>
+          สำหรับสร้างชื่อไฟล์เอกสารเพียงรายการเดียว
+        </li>
+
+        <li>
+          <b>ชุดเอกสารครบชุด</b>
+          สำหรับกรณีที่เอกสารหนึ่งเรื่องประกอบด้วยเอกสารหลายรายการ
+          และต้องการสร้างชื่อไฟล์ทั้งหมดพร้อมกัน
+        </li>
+
+      </ul>
+
+      ผู้ใช้งานสามารถเลือกโหมดที่ต้องการก่อนเริ่มกรอกข้อมูล
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 3 -->
+
+  <div class="arch-panel">
+
+    <h3>3. การสร้างชื่อไฟล์เดี่ยว</h3>
+
+    <div class="step-desc">
+
+      เลือกเมนู <b>ตั้งชื่อไฟล์</b>
+      และเลือกโหมด <b>ไฟล์เดี่ยว</b>
+
+      จากนั้นกรอกข้อมูลที่จำเป็น เช่น
+
+      <ul>
+
+        <li>วันที่ของเอกสาร</li>
+
+        <li>กอง / ศูนย์ / กลุ่ม</li>
+
+        <li>กลุ่มงาน / ฝ่าย</li>
+
+        <li>ประเภทเอกสาร</li>
+
+        <li>ชื่อเรื่อง</li>
+
+        <li>ครั้งที่ (ถ้ามี)</li>
+
+        <li>ถึง / ผู้รับ</li>
+
+        <li>ผู้มีอำนาจลงนาม (ถ้ามี)</li>
+
+      </ul>
+
+      หลังจากกรอกข้อมูลเรียบร้อยแล้ว
+      ให้กดปุ่ม <b>สร้างชื่อไฟล์</b>
+      ระบบจะนำข้อมูลที่กรอกมาจัดเรียงตามโครงสร้างที่กำหนดไว้
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 4 -->
+
+  <div class="arch-panel">
+
+    <h3>4. การสร้างชื่อไฟล์สำหรับชุดเอกสารครบชุด</h3>
+
+    <div class="step-desc">
+
+      สำหรับกรณีที่เอกสารหนึ่งเรื่องมีหลายเอกสารประกอบกัน
+      ผู้ใช้งานสามารถเลือกโหมด
+      <b>ชุดเอกสารครบชุด</b>
+
+      โดยภายในชุดเอกสารจะประกอบด้วยข้อมูล เช่น
+
+      <ul>
+
+        <li>
+          <b>ข้อมูลส่วนกลาง</b>
+          เช่น วันที่ กอง / ศูนย์ / กลุ่ม กลุ่มงาน / ฝ่าย
+          และครั้งที่
+        </li>
+
+        <li>
+          <b>บันทึก</b>
+          สำหรับกำหนดข้อมูลของเอกสารหลักที่เสนอ
+        </li>
+
+        <li>
+          <b>เอกสารแนบ</b>
+          สามารถเพิ่มเอกสารแนบได้มากกว่าหนึ่งรายการ
+        </li>
+
+        <li>
+          <b>หนังสือ (ร่าง)</b>
+          สำหรับกำหนดรหัสส่วนราชการ
+          ลำดับหนังสือส่งออก
+          ผู้ลงนาม ผู้รับ และชื่อเรื่อง
+        </li>
+
+      </ul>
+
+      เมื่อกรอกข้อมูลครบแล้ว
+      ให้กดปุ่ม <b>สร้างชื่อไฟล์ทั้งชุด</b>
+      ระบบจะแสดงชื่อไฟล์ของเอกสารแต่ละรายการ
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 5 -->
+
+  <div class="arch-panel">
+
+    <h3>5. การจัดการฟิลด์</h3>
+
+    <div class="step-desc">
+
+      ผู้ดูแลหรือผู้ใช้งานสามารถจัดการฟิลด์ที่ใช้ในระบบได้
+      ผ่านเมนู <b>จัดการฟิลด์</b>
+
+      โดยฟิลด์จะถูกแบ่งออกเป็นหมวดต่าง ๆ ได้แก่
+
+      <ul>
+
+        <li>
+          <b>ฟิลด์เริ่มต้นของระบบ</b>
+          คือฟิลด์พื้นฐานที่ระบบมีให้อยู่แล้ว
+        </li>
+
+        <li>
+          <b>ฟิลด์ที่ถูกแก้ไข</b>
+          คือฟิลด์เดิมที่มีการเปลี่ยนแปลงรายละเอียด
+        </li>
+
+        <li>
+          <b>ฟิลด์ที่สร้างเพิ่มเติม</b>
+          คือฟิลด์ที่ผู้ใช้งานเพิ่มเข้ามาใหม่
+        </li>
+
+        <li>
+          <b>ฟิลด์ที่ถูกลบ</b>
+          สามารถใช้สำหรับตรวจสอบหรือกู้คืนข้อมูลได้
+          หากระบบรองรับการกู้คืน
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 6 -->
+
+  <div class="arch-panel">
+
+    <h3>6. การเพิ่มฟิลด์เพิ่มเติม</h3>
+
+    <div class="step-desc">
+
+      เมื่อต้องการเพิ่มข้อมูลที่ไม่มีอยู่ในฟิลด์พื้นฐานของระบบ
+      สามารถสร้างฟิลด์เพิ่มเติมได้
+
+      ในการสร้างฟิลด์ ผู้ใช้งานต้องกำหนดข้อมูลสำคัญ ได้แก่
+
+      <ul>
+
+        <li>
+          <b>ชื่อฟิลด์</b>
+          เพื่อระบุว่าฟิลด์นี้ใช้สำหรับข้อมูลอะไร
+        </li>
+
+        <li>
+          <b>ประเภทของข้อมูล</b>
+          เช่น ข้อความ หรือรูปแบบข้อมูลอื่นตามที่ระบบรองรับ
+        </li>
+
+        <li>
+          <b>ตำแหน่งของฟิลด์ในโครงสร้างชื่อไฟล์</b>
+          เพื่อกำหนดว่าข้อมูลนี้จะปรากฏตรงไหน
+        </li>
+
+        <li>
+          <b>ฟิลด์บังคับ</b>
+          ผู้สร้างฟิลด์สามารถกำหนดได้ว่าผู้ใช้งานจำเป็นต้องกรอกข้อมูลนี้หรือไม่
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 7 -->
+
+  <div class="arch-panel">
+
+    <h3>7. การกำหนดตำแหน่งของฟิลด์ในชื่อไฟล์</h3>
+
+    <div class="step-desc">
+
+      ก่อนสร้างฟิลด์เพิ่มเติม
+      ควรกำหนดตำแหน่งของฟิลด์ในโครงสร้างชื่อไฟล์ก่อน
+
+      ตัวอย่างตำแหน่งที่สามารถกำหนดได้ เช่น
+
+      <ul>
+
+        <li>ก่อนรหัสส่วนราชการ</li>
+
+        <li>หลังรหัสส่วนราชการ</li>
+
+        <li>หลังลำดับหนังสือส่งออก</li>
+
+        <li>หลังเลขที่หนังสือส่งออก</li>
+
+        <li>ก่อนชื่อเรื่อง</li>
+
+        <li>หลังชื่อเรื่อง</li>
+
+        <li>ก่อนถึง / ผู้รับ</li>
+
+        <li>หลังถึง / ผู้รับ</li>
+
+        <li>ท้ายชื่อไฟล์</li>
+
+      </ul>
+
+      ตัวอย่างโครงสร้างชื่อไฟล์
+
+    </div>
+
+
+    <div class="arch-code">
+
+ปี_กอง_กลุ่มงาน_ประเภทเอกสาร_ชื่อเรื่อง_ฟิลด์เพิ่มเติม_ผู้รับ
+
+    </div>
+
+
+    <div class="step-desc" style="margin-top:14px;">
+
+      การกำหนดตำแหน่งล่วงหน้าจะช่วยให้ฟิลด์ใหม่
+      ถูกนำไปวางในตำแหน่งที่ถูกต้องตามรูปแบบการตั้งชื่อไฟล์
+      แทนที่จะถูกนำไปต่อท้ายชื่อไฟล์ทั้งหมดเหมือนกัน
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 8 -->
+
+  <div class="arch-panel">
+
+    <h3>8. การกำหนดฟิลด์บังคับ</h3>
+
+    <div class="step-desc">
+
+      ในขั้นตอนการเพิ่มหรือแก้ไขฟิลด์
+      ผู้ใช้งานสามารถกำหนดได้ว่า
+      ฟิลด์นั้นเป็น <b>ฟิลด์บังคับ</b> หรือ <b>ไม่บังคับ</b>
+
+      <ul>
+
+        <li>
+          <b>ฟิลด์บังคับ</b>
+          ผู้ใช้งานจะต้องกรอกข้อมูลก่อนจึงจะสามารถสร้างชื่อไฟล์ได้
+        </li>
+
+        <li>
+          <b>ฟิลด์ไม่บังคับ</b>
+          ผู้ใช้งานสามารถเว้นว่างได้
+          หากเอกสารนั้นไม่มีข้อมูลในส่วนดังกล่าว
+        </li>
+
+      </ul>
+
+      การกำหนดฟิลด์บังคับช่วยลดปัญหา
+      การสร้างชื่อไฟล์ที่มีข้อมูลสำคัญไม่ครบถ้วน
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 9 -->
+
+  <div class="arch-panel">
+
+    <h3>9. ตรวจสอบชื่อไฟล์ก่อนใช้งาน</h3>
+
+    <div class="step-desc">
+
+      หลังจากกดสร้างชื่อไฟล์
+      ระบบจะแสดงชื่อไฟล์ที่สร้างขึ้น
+
+      ผู้ใช้งานควรตรวจสอบข้อมูลก่อนนำไปใช้งาน เช่น
+
+      <ul>
+
+        <li>ปีของเอกสารถูกต้องหรือไม่</li>
+
+        <li>รหัสหน่วยงานถูกต้องหรือไม่</li>
+
+        <li>ประเภทเอกสารถูกต้องหรือไม่</li>
+
+        <li>ชื่อเรื่องถูกต้องและเข้าใจง่ายหรือไม่</li>
+
+        <li>ฟิลด์เพิ่มเติมอยู่ในตำแหน่งที่ถูกต้องหรือไม่</li>
+
+      </ul>
+
+      หากข้อมูลถูกต้องแล้ว
+      สามารถกดปุ่ม <b>คัดลอกชื่อไฟล์</b>
+      เพื่อนำไปใช้ตั้งชื่อไฟล์เอกสารจริงได้
+
+    </div>
+
+  </div>
+
+
+
+  <!-- STEP 10 -->
+
+  <div class="arch-panel">
+
+    <h3>10. การดูประวัติการตั้งชื่อไฟล์</h3>
+
+    <div class="step-desc">
+
+      ทุกครั้งที่มีการสร้างชื่อไฟล์
+      ระบบจะบันทึกประวัติไว้ในเมนู
+      <b>ประวัติการตั้งชื่อไฟล์</b>
+
+      ผู้ใช้งานสามารถ
+
+      <ul>
+
+        <li>ดูวันที่ดำเนินการ</li>
+
+        <li>ดูชื่อไฟล์ที่เคยสร้าง</li>
+
+        <li>ค้นหาชื่อไฟล์</li>
+
+        <li>คัดลอกชื่อไฟล์เพื่อนำกลับมาใช้งาน</li>
+
+      </ul>
+
+      ฟังก์ชันนี้ช่วยให้สามารถค้นหาและตรวจสอบชื่อไฟล์เดิม
+      โดยไม่จำเป็นต้องสร้างชื่อใหม่ทุกครั้ง
+
+    </div>
+
+  </div>
+
+
+
+  <!-- IMPORTANT -->
+
+  <div class="arch-panel">
+
+    <h3>ข้อควรระวังในการใช้งาน</h3>
+
+    <div class="step-desc">
+
+      <ul>
+
+        <li>
+          ควรตรวจสอบข้อมูลก่อนกดสร้างชื่อไฟล์ทุกครั้ง
+        </li>
+
+        <li>
+          ข้อมูลในฟิลด์ที่กำหนดเป็นฟิลด์บังคับ
+          ต้องกรอกให้ครบถ้วน
+        </li>
+
+        <li>
+          ก่อนเพิ่มฟิลด์ใหม่
+          ควรกำหนดตำแหน่งในโครงสร้างชื่อไฟล์ให้เหมาะสม
+        </li>
+
+        <li>
+          หากเป็นชื่อเรื่องที่มีหลายคำ
+          ระบบจะจัดรูปแบบตามกติกาการตั้งชื่อไฟล์ของระบบ
+        </li>
+
+        <li>
+          ควรตรวจสอบชื่อไฟล์ที่ระบบสร้าง
+          ก่อนนำไปใช้กับเอกสารจริง
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- PDF DOWNLOAD -->
+
+  <div class="arch-panel">
+
+    <h3>เอกสารประกอบการใช้งาน</h3>
+
+    <div class="step-desc">
+
+      สามารถดาวน์โหลดเอกสารคู่มือเพิ่มเติม
+      เพื่อดูแนวทางและตัวอย่างการตั้งชื่อไฟล์ได้
+
+    </div>
+
+
+    <a
+      id="guidePdfDownload"
+      class="btn-primary"
+      download="แนวทางและตัวอย่างการตั้งชื่อไฟล์เอกสารหนังสือ.pdf"
+      style="
+        display:inline-flex;
+        text-decoration:none;
+        margin-top:14px;
+        width:fit-content;
+      "
+    >
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        style="width:16px;height:16px;"
+      >
+        <path d="M12 3v12"/>
+        <path d="M7 10l5 5 5-5"/>
+        <path d="M5 21h14"/>
+      </svg>
+
+      ดาวน์โหลดคู่มือ (PDF)
+
+    </a>
+
+  </div>
+
+</div>
 
       <!-- ADMIN -->
       <div class="page" id="page-admin">
@@ -1717,7 +2395,461 @@ function saveUserHistory(list){
    - ไม่มีนามสกุลไฟล์ (ข้อ 1)
    - ไม่มีวงเล็บเหลี่ยม [] รอบกลุ่มงาน (ข้อ 2)
    ========================================================= */
+   /* =====================================
+   CUSTOM FIELD POSITION
+===================================== */
+
+function cleanFilePart(value){
+
+  return String(value || '')
+    .trim()
+    .replace(/\s+/g,'_');
+
+}
+
+
+/* แทรกข้อมูลก่อนค่าที่กำหนด */
+
+function insertBeforePart(
+  parts,
+  anchor,
+  value
+){
+
+  var index =
+    parts.indexOf(anchor);
+
+
+  if(index === -1){
+
+    parts.push(value);
+
+    return;
+
+  }
+
+
+  parts.splice(
+    index,
+    0,
+    value
+  );
+
+}
+
+
+/* แทรกข้อมูลหลังค่าที่กำหนด */
+
+function insertAfterPart(
+  parts,
+  anchor,
+  value
+){
+
+  var index =
+    parts.indexOf(anchor);
+
+
+  if(index === -1){
+
+    parts.push(value);
+
+    return;
+
+  }
+
+
+  parts.splice(
+    index + 1,
+    0,
+    value
+  );
+
+}
+
+
+/* =====================================
+   จัดตำแหน่ง Custom Field
+===================================== */
+
+function applyCustomFieldPositions(parts){
+
+  if(
+    typeof getCustomFieldEntries !==
+    'function'
+  ){
+    return parts;
+  }
+
+
+  var fields =
+    getCustomFieldEntries();
+
+
+  if(!fields.length){
+    return parts;
+  }
+
+
+  /* ข้อมูลอ้างอิงจากฟอร์ม */
+
+  var deptCode = '';
+
+  var order = '';
+
+  var letterNo = '';
+
+  var title = '';
+
+  var recipient = '';
+
+
+  var deptInput =
+    document.getElementById(
+      'f-mdes'
+    );
+
+  if(deptInput){
+    deptCode =
+      cleanFilePart(
+        deptInput.value
+      );
+  }
+
+
+  var orderInput =
+    document.getElementById(
+      'f-order'
+    );
+
+  if(orderInput){
+    order =
+      cleanFilePart(
+        orderInput.value
+      );
+  }
+
+
+  var letterNoInput =
+    document.getElementById(
+      'f-letter-no'
+    );
+
+  if(letterNoInput){
+    letterNo =
+      cleanFilePart(
+        letterNoInput.value
+      );
+  }
+
+
+  var titleInput =
+    document.getElementById(
+      'f-title'
+    );
+
+  if(titleInput){
+    title =
+      cleanFilePart(
+        titleInput.value
+      );
+  }
+
+
+  var recipientInput =
+    document.getElementById(
+      'f-to'
+    );
+
+  if(recipientInput){
+    recipient =
+      cleanFilePart(
+        recipientInput.value
+      );
+  }
+
+
+  /* วน Custom Field ทีละตัว */
+
+  fields.forEach(function(field){
+
+    if(!field.value){
+      return;
+    }
+
+
+    var value =
+      cleanFilePart(
+        field.value
+      );
+
+
+    switch(field.position){
+
+
+      /* -------------------------
+         ก่อนรหัสส่วนราชการ
+      ------------------------- */
+
+      case 'before-dept':
+
+        if(deptCode){
+
+          insertBeforePart(
+            parts,
+            deptCode,
+            value
+          );
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         หลังรหัสส่วนราชการ
+      ------------------------- */
+
+      case 'after-dept':
+
+        if(deptCode){
+
+          insertAfterPart(
+            parts,
+            deptCode,
+            value
+          );
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         หลังลำดับหนังสือส่งออก
+      ------------------------- */
+
+      case 'after-order':
+
+        if(order){
+
+          insertAfterPart(
+            parts,
+            order,
+            value
+          );
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         หลังเลขที่หนังสือส่งออก
+      ------------------------- */
+
+      case 'after-letter-no':
+
+        if(letterNo){
+
+          insertAfterPart(
+            parts,
+            letterNo,
+            value
+          );
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         ก่อนชื่อเรื่อง
+      ------------------------- */
+
+      case 'before-title':
+
+        if(title){
+
+          var titleIndex =
+            parts.findIndex(
+              function(part){
+
+                return (
+                  part === title ||
+                  part.indexOf(
+                    title + '_'
+                  ) === 0
+                );
+
+              }
+            );
+
+
+          if(titleIndex !== -1){
+
+            parts.splice(
+              titleIndex,
+              0,
+              value
+            );
+
+          }else{
+
+            parts.push(value);
+
+          }
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         หลังชื่อเรื่อง
+      ------------------------- */
+
+      case 'after-title':
+
+        if(title){
+
+          var afterTitleIndex =
+            parts.findIndex(
+              function(part){
+
+                return (
+                  part === title ||
+                  part.indexOf(
+                    title + '_'
+                  ) === 0
+                );
+
+              }
+            );
+
+
+          if(afterTitleIndex !== -1){
+
+            parts.splice(
+              afterTitleIndex + 1,
+              0,
+              value
+            );
+
+          }else{
+
+            parts.push(value);
+
+          }
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         ก่อนผู้รับ
+      ------------------------- */
+
+      case 'before-recipient':
+
+        if(recipient){
+
+          insertBeforePart(
+            parts,
+            recipient,
+            value
+          );
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         หลังผู้รับ
+      ------------------------- */
+
+      case 'after-recipient':
+
+        if(recipient){
+
+          insertAfterPart(
+            parts,
+            recipient,
+            value
+          );
+
+        }else{
+
+          parts.push(value);
+
+        }
+
+        break;
+
+
+      /* -------------------------
+         ท้ายชื่อไฟล์
+      ------------------------- */
+
+      case 'end':
+
+      default:
+
+        parts.push(value);
+
+        break;
+
+    }
+
+  });
+
+
+  return parts;
+
+}
 document.getElementById('genBtn').addEventListener('click',()=>{
+  if(
+  typeof validateRequiredCustomFields ===
+  'function'
+){
+
+  if(
+    !validateRequiredCustomFields()
+  ){
+    return;
+  }
+
+}
   const doctype=getSelCode('f-doctype');
   const title=document.getElementById('f-title').value.trim();
   const to=document.getElementById('f-to').value.trim();
@@ -1785,9 +2917,20 @@ document.getElementById('genBtn').addEventListener('click',()=>{
     filename=parts.join('_');
   }
 
-  const cfVals=getCustomFieldValues();
-  if(cfVals.length) filename+='_'+cfVals.map(v=>v.replace(/\s+/g,'_')).join('_');
+  var filenameParts =
+  filename
+    .split('_')
+    .filter(Boolean);
 
+
+filenameParts =
+  applyCustomFieldPositions(
+    filenameParts
+  );
+
+
+filename =
+  filenameParts.join('_');
   document.getElementById('emptyState').style.display='none';
   document.getElementById('resultBox').style.display='flex';
   document.getElementById('resultName').textContent=filename;
