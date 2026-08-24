@@ -936,11 +936,15 @@ position:
   }
 
   /* ---------- 5) Render Fields Page ---------- */
-  function fieldTypeLabel(f) {
-    if (f.type === "select") return "Dropdown";
-    if (f.type === "date") return "วันที่";
-    return "ข้อความ";
-  }
+
+function fieldTypeLabel(f) {
+  if (f.type === "select") return "Dropdown";
+  if (f.type === "date") return "วันที่";
+  return "ข้อความ";
+}
+
+
+/* ตรวจสอบว่าฟิลด์ระบบถูกแก้ไขจริงหรือไม่ */
 
 function isModifiedSystemField(f) {
 
@@ -956,17 +960,15 @@ function isModifiedSystemField(f) {
     return true;
   }
 
-
   var keys = [
-  "label",
-  "targetPage",
-  "type",
-  "inputMode",
-  "maxDigits",
-  "maxLetters",
-  "required"
-];
-
+    "label",
+    "targetPage",
+    "type",
+    "inputMode",
+    "maxDigits",
+    "maxLetters",
+    "required"
+  ];
 
   return keys.some(function (key) {
 
@@ -980,32 +982,34 @@ function isModifiedSystemField(f) {
         ? null
         : base[key];
 
-    return JSON.stringify(currentValue) !==
-      JSON.stringify(baseValue);
+    return (
+      JSON.stringify(currentValue) !==
+      JSON.stringify(baseValue)
+    );
 
   });
 
 }
-  function renderFieldList(
+
+
+/* แสดงรายการฟิลด์ */
+
+function renderFieldList(
   list,
   containerId,
   emptyId
 ) {
 
   var wrap =
-    document.getElementById(
-      containerId
-    );
+    document.getElementById(containerId);
 
   var empty =
-    document.getElementById(
-      emptyId
-    );
+    document.getElementById(emptyId);
 
   if (!wrap) return;
 
 
-  if (!list.length) {
+  if (!list || !list.length) {
 
     wrap.innerHTML = "";
 
@@ -1014,7 +1018,6 @@ function isModifiedSystemField(f) {
     }
 
     return;
-
   }
 
 
@@ -1025,21 +1028,21 @@ function isModifiedSystemField(f) {
 
   var targetText = {
 
-    both: "ทั้งสองหน้า",
+    both: "ทุกส่วนของระบบ",
 
     single: "ไฟล์เดี่ยว",
 
     "single-draft":
-      "ไฟล์เดี่ยว (ร่าง)",
+      "ไฟล์เดี่ยว (ร่างหนังสือ)",
 
     "single-signed":
-      "ไฟล์เดี่ยว (ลงนาม)",
+      "ไฟล์เดี่ยว (ลงนามแล้ว)",
 
     bundle:
-      "ชุดเอกสาร",
+      "ชุดเอกสารครบชุด",
 
     "bundle-common":
-      "ชุดเอกสาร (ส่วนกลาง)",
+      "ชุดเอกสาร (ข้อมูลส่วนกลาง)",
 
     "bundle-attachments":
       "ชุดเอกสาร (เอกสารแนบ)",
@@ -1062,54 +1065,37 @@ function isModifiedSystemField(f) {
             <div>
 
               <span class="cf-card-title">
-
                 ${escapeHtml(f.label)}
-
               </span>
-
 
               <span class="cf-card-type">
-
                 ${fieldTypeLabel(f)}
-
               </span>
 
-
               <span class="cf-card-target">
-
                 ${
                   targetText[
                     f.targetPage || "both"
-                  ] || "ปรับแต่งแล้ว"
+                  ] || "ทุกส่วนของระบบ"
                 }
-
               </span>
-
 
               ${
                 f.isSystem
-
                   ? '<span class="cf-system-badge">ฟิลด์ระบบ</span>'
-
-                  : ''
+                  : ""
               }
-
 
               ${
                 f.required
-
-                  ? '<span class="cf-required-badge">จำเป็น</span>'
-
-                  : ''
+                  ? '<span class="cf-required-badge">บังคับกรอก</span>'
+                  : ""
               }
-
 
               ${
                 f.locked
-
                   ? '<span class="cf-locked-badge">ล็อกโครงสร้าง</span>'
-
-                  : ''
+                  : ""
               }
 
             </div>
@@ -1118,17 +1104,16 @@ function isModifiedSystemField(f) {
             <div class="cf-card-actions">
 
               <button
-                data-edit="${f.id}"
                 type="button"
+                data-edit="${f.id}"
               >
                 แก้ไข
               </button>
 
-
               <button
-                data-del="${f.id}"
-                class="danger"
                 type="button"
+                class="danger"
+                data-del="${f.id}"
               >
                 ลบ
               </button>
@@ -1150,13 +1135,9 @@ function isModifiedSystemField(f) {
                       .map(function (o) {
 
                         return `
-
                           <span class="cf-chip">
-
                             ${escapeHtml(o)}
-
                           </span>
-
                         `;
 
                       })
@@ -1194,17 +1175,17 @@ function isModifiedSystemField(f) {
                         : "ตัวเลขและตัวอักษร"
                   }
 
-                  ·
+                  · ตัวเลขสูงสุด
 
-                  ตัวเลขสูงสุด
+                  ${
+                    f.maxDigits || "ไม่จำกัด"
+                  }
 
-                  ${f.maxDigits || "ไม่จำกัด"}
+                  · ตัวอักษรสูงสุด
 
-                  ·
-
-                  ตัวอักษรสูงสุด
-
-                  ${f.maxLetters || "ไม่จำกัด"}
+                  ${
+                    f.maxLetters || "ไม่จำกัด"
+                  }
 
                 </div>
 
@@ -1217,7 +1198,8 @@ function isModifiedSystemField(f) {
 
       `;
 
-    }).join("");
+    })
+    .join("");
 
 
   /* ปุ่มแก้ไข */
@@ -1236,6 +1218,7 @@ function isModifiedSystemField(f) {
           );
 
         }
+
       );
 
     });
@@ -1256,8 +1239,10 @@ function isModifiedSystemField(f) {
             loadCustomFields()
               .find(function (f) {
 
-                return f.id ===
-                  btn.dataset.del;
+                return (
+                  f.id ===
+                  btn.dataset.del
+                );
 
               });
 
@@ -1266,63 +1251,46 @@ function isModifiedSystemField(f) {
 
 
           document
-            .getElementById(
-              "delFieldId"
-            )
+            .getElementById("delFieldId")
             .value =
-              field.id;
+            field.id;
 
 
           document
-            .getElementById(
-              "delFieldName"
-            )
+            .getElementById("delFieldName")
             .textContent =
-              field.label;
+            field.label;
 
 
           document
-            .getElementById(
-              "delActionType"
-            )
+            .getElementById("delActionType")
             .value =
-              "trash";
+            "trash";
 
 
           document
-            .getElementById(
-              "delTargetWrap"
-            )
+            .getElementById("delTargetWrap")
             .style.display =
-              "none";
+            "none";
 
 
           document
-            .getElementById(
-              "delTargetPage"
-            )
+            .getElementById("delTargetPage")
             .value =
-              field.targetPage ||
-              "both";
+            field.targetPage || "both";
 
 
-          if (field.required) {
+          var warning =
+            document.getElementById(
+              "delWarning"
+            );
 
-            document
-              .getElementById(
-                "delWarning"
-              )
-              .style.display =
-                "block";
+          if (warning) {
 
-          } else {
-
-            document
-              .getElementById(
-                "delWarning"
-              )
-              .style.display =
-                "none";
+            warning.style.display =
+              field.required
+                ? "block"
+                : "none";
 
           }
 
@@ -1342,239 +1310,111 @@ function isModifiedSystemField(f) {
     });
 
 }
-  function renderFieldList(list, containerId, emptyId) {
-
-  var wrap = document.getElementById(containerId);
-  var empty = document.getElementById(emptyId);
-
-  if (!wrap) return;
 
 
-  if (!list || !list.length) {
+/* แสดงหน้าจัดการฟิลด์ */
 
-    wrap.innerHTML = "";
+function renderFieldsPage() {
 
-    if (empty) {
-      empty.style.display = "block";
-    }
-
-    return;
-
-  }
+  var list =
+    loadCustomFields();
 
 
-  if (empty) {
-    empty.style.display = "none";
-  }
+  /* =========================
+     1. ฟิลด์เริ่มต้นของระบบ
+  ========================= */
 
+  var defaultSystemFields =
+    list.filter(function (f) {
 
-  var targetText = {
-    both: "ทั้งสองหน้า",
-    single: "ไฟล์เดี่ยว",
-    "single-draft": "ไฟล์เดี่ยว (ร่าง)",
-    "single-signed": "ไฟล์เดี่ยว (ลงนาม)",
-    bundle: "ชุดเอกสาร",
-    "bundle-common": "ชุดเอกสาร (ส่วนกลาง)",
-    "bundle-attachments": "ชุดเอกสาร (เอกสารแนบ)",
-    "bundle-draft-letter": "ชุดเอกสาร (หนังสือร่าง)"
-  };
-
-
-  wrap.innerHTML = list.map(function (f) {
-
-    return `
-      <div class="cf-card">
-
-        <div class="cf-card-head">
-
-          <div>
-
-            <span class="cf-card-title">
-              ${escapeHtml(f.label)}
-            </span>
-
-            <span class="cf-card-type">
-              ${fieldTypeLabel(f)}
-            </span>
-
-            <span class="cf-card-target">
-              ${targetText[f.targetPage || "both"] || "ทั้งสองหน้า"}
-            </span>
-
-            ${f.isSystem
-              ? '<span class="cf-system-badge">ฟิลด์ระบบ</span>'
-              : ''
-            }
-
-            ${f.required
-              ? '<span class="cf-required-badge">บังคับกรอก</span>'
-              : ''
-            }
-
-          </div>
-
-
-          <div class="cf-card-actions">
-
-            <button
-              type="button"
-              data-edit="${f.id}"
-            >
-              แก้ไข
-            </button>
-
-
-            <button
-              type="button"
-              class="danger"
-              data-del="${f.id}"
-            >
-              ลบ
-            </button>
-
-          </div>
-
-        </div>
-
-
-        ${f.type === "select"
-          ? `
-            <div class="cf-options-wrap">
-
-              ${(f.options || []).map(function (o) {
-                return `
-                  <span class="cf-chip">
-                    ${escapeHtml(o)}
-                  </span>
-                `;
-              }).join("")}
-
-            </div>
-          `
-          : ""
-        }
-
-
-      </div>
-    `;
-
-  }).join("");
-
-
-  wrap
-    .querySelectorAll("[data-edit]")
-    .forEach(function (btn) {
-
-      btn.addEventListener("click", function () {
-
-        openFieldModal(btn.dataset.edit);
-
-      });
+      return (
+        f.isSystem &&
+        !isModifiedSystemField(f)
+      );
 
     });
 
 
-  wrap
-    .querySelectorAll("[data-del]")
-    .forEach(function (btn) {
+  renderFieldList(
 
-      btn.addEventListener("click", function () {
+    defaultSystemFields,
 
-        var field = loadCustomFields().find(function (f) {
-          return f.id === btn.dataset.del;
-        });
+    "adminFieldsList",
 
-        if (!field) return;
+    "adminFieldsEmpty"
+
+  );
 
 
-        document.getElementById("delFieldId").value =
-          field.id;
+  /* =========================
+     2. ฟิลด์ที่ถูกแก้ไข
+  ========================= */
 
-        document.getElementById("delFieldName").textContent =
-          field.label;
+  var modifiedSystemFields =
+    list.filter(function (f) {
 
-        document.getElementById("delActionType").value =
-          "trash";
-
-        document.getElementById("delTargetWrap").style.display =
-          "none";
-
-        document.getElementById("delTargetPage").value =
-          field.targetPage || "both";
-
-        document
-          .getElementById("deleteFieldModal")
-          .classList.add("open");
-
-      });
+      return (
+        f.isSystem &&
+        isModifiedSystemField(f)
+      );
 
     });
+
+
+  renderFieldList(
+
+    modifiedSystemFields,
+
+    "modifiedFieldsList",
+
+    "modifiedFieldsEmpty"
+
+  );
+
+
+  /* =========================
+     3. ฟิลด์ที่สร้างเพิ่มเติม
+  ========================= */
+
+  var createdFields =
+    list.filter(function (f) {
+
+      return !f.isSystem;
+
+    });
+
+
+  renderFieldList(
+
+    createdFields,
+
+    "createdFieldsList",
+
+    "createdFieldsEmpty"
+
+  );
+
+
+  /* อัปเดตจำนวนฟิลด์ */
+
+  var stat =
+    document.getElementById(
+      "statFieldCount"
+    );
+
+  if (stat) {
+
+    stat.textContent =
+      list.length;
+
+  }
+
+
+  /* ฟิลด์ที่ถูกลบ */
+
+  renderTrashSection();
 
 }
-    // =================================
-    // 1. ฟิลด์เริ่มต้นของระบบ
-    // =================================
-
-    var defaultSystemFields = list.filter(function (f) {
-      return f.isSystem && !isModifiedSystemField(f);
-    });
-
-    renderFieldList(
-      defaultSystemFields,
-
-      "adminFieldsList",
-
-      "adminFieldsEmpty",
-    );
-
-    // =================================
-    // 2. ฟิลด์ที่ถูกแก้ไข
-    // =================================
-
-    var modifiedSystemFields = list.filter(function (f) {
-      return f.isSystem && isModifiedSystemField(f);
-    });
-
-    renderFieldList(
-      modifiedSystemFields,
-
-      "modifiedFieldsList",
-
-      "modifiedFieldsEmpty",
-    );
-
-    // =================================
-    // 3. ฟิลด์ที่สร้างเพิ่มเติม
-    // =================================
-
-    var createdFields = list.filter(function (f) {
-      return !f.isSystem;
-    });
-
-    renderFieldList(
-      createdFields,
-
-      "createdFieldsList",
-
-      "createdFieldsEmpty",
-    );
-
-    // =================================
-    // อัปเดตจำนวนฟิลด์ที่หน้าแรก
-    // =================================
-
-    var stat = document.getElementById("statFieldCount");
-
-    if (stat) {
-      stat.textContent = list.length;
-    }
-
-    // =================================
-    // แสดงฟิลด์ที่ถูกลบ
-    // =================================
-
-    renderTrashSection();
-  }
 
   /* ---------- 5b) Render Trash Section ---------- */
   function renderTrashSection() {
