@@ -661,17 +661,7 @@
           สำหรับผู้ดูแลระบบในการจัดการข้อมูล
         </span>
       </button>
-
-
-      <button
-        class="home-menu-btn"
-        data-page="home"
-      >
-        <b>หน้าแรก</b>
-        <span>
-          ดูสถิติการใช้งานและทางลัดเมนูทั้งหมด
-        </span>
-      </button>
+      
 
     </div>
 
@@ -1966,6 +1956,26 @@ function goPage(name){
 }
 navItems.forEach(n=>n.addEventListener('click',()=>goPage(n.dataset.page)));
 document.getElementById('goCreateBtn').addEventListener('click',()=>goPage('create'));
+document
+  .querySelectorAll(
+    '.home-menu-btn'
+  )
+  .forEach(function(btn){
+
+    btn.addEventListener(
+      'click',
+
+      function(){
+
+        goPage(
+          btn.dataset.page
+        );
+
+      }
+
+    );
+
+  });
 
 /* MODAL */
 function openModal(id){document.getElementById(id).classList.add('open');}

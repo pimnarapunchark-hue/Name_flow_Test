@@ -887,6 +887,362 @@
       );
     });
   }
+  function renderFieldList(
+  list,
+  containerId,
+  emptyId
+) {
+
+  var wrap =
+    document.getElementById(
+      containerId
+    );
+
+  var empty =
+    document.getElementById(
+      emptyId
+    );
+
+  if (!wrap) return;
+
+
+  if (!list.length) {
+
+    wrap.innerHTML = "";
+
+    if (empty) {
+      empty.style.display = "block";
+    }
+
+    return;
+
+  }
+
+
+  if (empty) {
+    empty.style.display = "none";
+  }
+
+
+  var targetText = {
+
+    both: "ทั้งสองหน้า",
+
+    single: "ไฟล์เดี่ยว",
+
+    "single-draft":
+      "ไฟล์เดี่ยว (ร่าง)",
+
+    "single-signed":
+      "ไฟล์เดี่ยว (ลงนาม)",
+
+    bundle:
+      "ชุดเอกสาร",
+
+    "bundle-common":
+      "ชุดเอกสาร (ส่วนกลาง)",
+
+    "bundle-attachments":
+      "ชุดเอกสาร (เอกสารแนบ)",
+
+    "bundle-draft-letter":
+      "ชุดเอกสาร (หนังสือร่าง)"
+
+  };
+
+
+  wrap.innerHTML =
+    list.map(function (f) {
+
+      return `
+
+        <div class="cf-card">
+
+          <div class="cf-card-head">
+
+            <div>
+
+              <span class="cf-card-title">
+
+                ${escapeHtml(f.label)}
+
+              </span>
+
+
+              <span class="cf-card-type">
+
+                ${fieldTypeLabel(f)}
+
+              </span>
+
+
+              <span class="cf-card-target">
+
+                ${
+                  targetText[
+                    f.targetPage || "both"
+                  ] || "ปรับแต่งแล้ว"
+                }
+
+              </span>
+
+
+              ${
+                f.isSystem
+
+                  ? '<span class="cf-system-badge">ฟิลด์ระบบ</span>'
+
+                  : ''
+              }
+
+
+              ${
+                f.required
+
+                  ? '<span class="cf-required-badge">จำเป็น</span>'
+
+                  : ''
+              }
+
+
+              ${
+                f.locked
+
+                  ? '<span class="cf-locked-badge">ล็อกโครงสร้าง</span>'
+
+                  : ''
+              }
+
+            </div>
+
+
+            <div class="cf-card-actions">
+
+              <button
+                data-edit="${f.id}"
+                type="button"
+              >
+                แก้ไข
+              </button>
+
+
+              <button
+                data-del="${f.id}"
+                class="danger"
+                type="button"
+              >
+                ลบ
+              </button>
+
+            </div>
+
+          </div>
+
+
+          ${
+            f.type === "select"
+
+              ? `
+
+                <div class="cf-options-wrap">
+
+                  ${
+                    (f.options || [])
+                      .map(function (o) {
+
+                        return `
+
+                          <span class="cf-chip">
+
+                            ${escapeHtml(o)}
+
+                          </span>
+
+                        `;
+
+                      })
+                      .join("")
+
+                    ||
+
+                    '<span class="cf-chip">ยังไม่มีตัวเลือก</span>'
+                  }
+
+                </div>
+
+              `
+
+              : ""
+          }
+
+
+          ${
+            f.type === "text"
+
+              ? `
+
+                <div class="cf-card-rules">
+
+                  ${
+                    f.inputMode === "number"
+
+                      ? "ตัวเลขเท่านั้น"
+
+                      : f.inputMode === "letters"
+
+                        ? "ตัวอักษรเท่านั้น"
+
+                        : "ตัวเลขและตัวอักษร"
+                  }
+
+                  ·
+
+                  ตัวเลขสูงสุด
+
+                  ${f.maxDigits || "ไม่จำกัด"}
+
+                  ·
+
+                  ตัวอักษรสูงสุด
+
+                  ${f.maxLetters || "ไม่จำกัด"}
+
+                </div>
+
+              `
+
+              : ""
+          }
+
+        </div>
+
+      `;
+
+    }).join("");
+
+
+  /* ปุ่มแก้ไข */
+
+  wrap
+    .querySelectorAll("[data-edit]")
+    .forEach(function (btn) {
+
+      btn.addEventListener(
+        "click",
+
+        function () {
+
+          openFieldModal(
+            btn.dataset.edit
+          );
+
+        }
+      );
+
+    });
+
+
+  /* ปุ่มลบ */
+
+  wrap
+    .querySelectorAll("[data-del]")
+    .forEach(function (btn) {
+
+      btn.addEventListener(
+        "click",
+
+        function () {
+
+          var field =
+            loadCustomFields()
+              .find(function (f) {
+
+                return f.id ===
+                  btn.dataset.del;
+
+              });
+
+
+          if (!field) return;
+
+
+          document
+            .getElementById(
+              "delFieldId"
+            )
+            .value =
+              field.id;
+
+
+          document
+            .getElementById(
+              "delFieldName"
+            )
+            .textContent =
+              field.label;
+
+
+          document
+            .getElementById(
+              "delActionType"
+            )
+            .value =
+              "trash";
+
+
+          document
+            .getElementById(
+              "delTargetWrap"
+            )
+            .style.display =
+              "none";
+
+
+          document
+            .getElementById(
+              "delTargetPage"
+            )
+            .value =
+              field.targetPage ||
+              "both";
+
+
+          if (field.required) {
+
+            document
+              .getElementById(
+                "delWarning"
+              )
+              .style.display =
+                "block";
+
+          } else {
+
+            document
+              .getElementById(
+                "delWarning"
+              )
+              .style.display =
+                "none";
+
+          }
+
+
+          document
+            .getElementById(
+              "deleteFieldModal"
+            )
+            .classList.add(
+              "open"
+            );
+
+        }
+
+      );
+
+    });
+
+}
   function renderFieldsPage() {
     var list = loadCustomFields();
 
