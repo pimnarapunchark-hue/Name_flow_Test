@@ -526,6 +526,27 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         <span class="label">จัดการฟิลด์เพิ่มเติม</span>
       </button>
+      <button
+  class="nav-item"
+  data-page="structure"
+>
+
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path d="M4 7h16"/>
+    <path d="M4 12h16"/>
+    <path d="M4 17h16"/>
+  </svg>
+
+  <span class="label">
+    จัดการโครงสร้างการตั้งชื่อไฟล์
+  </span>
+
+</button>
       <button class="nav-item" data-page="history">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
         <span class="label">ประวัติการตั้งชื่อไฟล์</span>
@@ -661,7 +682,7 @@
           สำหรับผู้ดูแลระบบในการจัดการข้อมูล
         </span>
       </button>
-      
+
 
     </div>
 
@@ -1636,6 +1657,7 @@
 
       <!-- FIELDS: จัดการฟิลด์เพิ่มเติม (เปิดให้ทุกคนใช้งานได้ ไม่จำกัดเฉพาะแอดมิน) -->
       <div class="page" id="page-fields"></div>
+      <div class="page"id="page-structure"></div>
 
       <div class="footer-bar" id="globalFooterBar">
         <span>© 2569 ระบบช่วยตั้งชื่อไฟล์เอกสารราชการ v2.0.0</span>
@@ -1953,6 +1975,12 @@ function goPage(name){
   if(name==='history')loadHistory();
   if(name==='admin')renderAdminAll();
   if(name==='fields'&&window.renderFieldsPage)renderFieldsPage();
+  if(
+  name === 'structure' &&
+  window.renderStructurePage
+){
+  renderStructurePage();
+}
 }
 navItems.forEach(n=>n.addEventListener('click',()=>goPage(n.dataset.page)));
 document.getElementById('goCreateBtn').addEventListener('click',()=>goPage('create'));
@@ -3259,5 +3287,6 @@ document.getElementById('setResetBtn').addEventListener('click',function(){
 })();
 </script>
 <script src="custom-fields.js"></script>
+<script src="naming-structure.js"></script>
 </body>
 </html>

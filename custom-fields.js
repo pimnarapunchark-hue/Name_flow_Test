@@ -143,6 +143,17 @@
     <option value="after-recipient">
       หลังถึง / ผู้รับ
     </option>
+    <div class="cf-checkbox-row">
+
+  <input
+    type="checkbox"
+    id="cfRequired">
+
+  <label for="cfRequired">
+    ฟิลด์นี้บังคับกรอก
+  </label>
+
+</div>
 
   </select>
 
@@ -597,7 +608,12 @@
       maxLetters: 0,
       isSystem: true,
       locked: false,
-      required: false,
+
+required:
+  document.getElementById("cfRequired").checked,
+
+position:
+  document.getElementById("cfPosition").value,
     },
     {
       id: "sys_order",
@@ -609,7 +625,12 @@
       maxLetters: 0,
       isSystem: true,
       locked: false,
-      required: false,
+
+required:
+  document.getElementById("cfRequired").checked,
+
+position:
+  document.getElementById("cfPosition").value,
     },
     {
       id: "sys_letterno",
@@ -621,7 +642,12 @@
       maxLetters: 0,
       isSystem: true,
       locked: false,
-      required: false,
+
+required:
+  document.getElementById("cfRequired").checked,
+
+position:
+  document.getElementById("cfPosition").value,
     },
     {
       id: "sys_title",
@@ -633,7 +659,12 @@
       maxLetters: 0,
       isSystem: true,
       locked: false,
-      required: false,
+
+required:
+  document.getElementById("cfRequired").checked,
+
+position:
+  document.getElementById("cfPosition").value,
     },
     {
       id: "sys_session",
@@ -645,7 +676,12 @@
       maxLetters: 0,
       isSystem: true,
       locked: false,
-      required: false,
+
+required:
+  document.getElementById("cfRequired").checked,
+
+position:
+  document.getElementById("cfPosition").value,
     },
     {
       id: "sys_to",
@@ -657,7 +693,12 @@
       maxLetters: 100,
       isSystem: true,
       locked: false,
-      required: false,
+
+required:
+  document.getElementById("cfRequired").checked,
+
+position:
+  document.getElementById("cfPosition").value,
     },
     {
       id: "sys_signer",
@@ -669,7 +710,12 @@
       maxLetters: 100,
       isSystem: true,
       locked: false,
-      required: false,
+
+required:
+  document.getElementById("cfRequired").checked,
+
+position:
+  document.getElementById("cfPosition").value,
     },
   ];
 
@@ -711,21 +757,37 @@
   var MIGRATION_FLAG = "system_fields_migrated_v4";
 
   function normalizeField(f) {
-    f.inputMode = f.inputMode || "any";
-    f.maxDigits = Number.isFinite(Number(f.maxDigits))
+
+  f.inputMode =
+    f.inputMode || "any";
+
+
+  f.maxDigits =
+    Number.isFinite(Number(f.maxDigits))
       ? Math.max(0, Number(f.maxDigits))
       : 0;
-    f.maxLetters = Number.isFinite(Number(f.maxLetters))
+
+
+  f.maxLetters =
+    Number.isFinite(Number(f.maxLetters))
       ? Math.max(0, Number(f.maxLetters))
       : 0;
-    f.locked = !!f.locked;
-  // เพิ่มตรงนี้
-  if(!f.position){
-    f.position = "end";
-  }
+
+
+  f.locked =
+    !!f.locked;
+
+
+  f.required =
+    !!f.required;
+
+
+  f.position =
+    f.position || "end";
 
 
   return f;
+
 }
   
 
@@ -838,55 +900,50 @@
     return "ข้อความ";
   }
 
-  function isModifiedSystemField(f) {
-    // ถ้าไม่ใช่ฟิลด์ระบบ
-    // จะไม่ถือว่าเป็นฟิลด์ที่ถูกแก้ไขในส่วนนี้
+function isModifiedSystemField(f) {
 
-    if (!f.isSystem) {
-      return false;
-    }
-
-    // หาฟิลด์ต้นฉบับ
-
-    var base = defaultFieldBaseline.find(function (x) {
-      return x.id === f.id;
-    });
-
-    // ถ้าไม่มีข้อมูลต้นฉบับ
-    // ให้ถือว่าเป็นฟิลด์ที่ถูกแก้ไข
-
-    if (!base) {
-      return true;
-    }
-
-    // รายการข้อมูลที่จะใช้ตรวจสอบ
-
-    var keys = [
-      "label",
-
-      "targetPage",
-
-      "type",
-
-      "inputMode",
-
-      "maxDigits",
-
-      "maxLetters",
-
-      "required",
-
-      "position",
-    ];
-
-    // เปรียบเทียบข้อมูลปัจจุบันกับข้อมูลเริ่มต้น
-
-    return keys.some(function (key) {
-      return (
-        JSON.stringify(f[key] || null) !== JSON.stringify(base[key] || null)
-      );
-    });
+  if (!f.isSystem) {
+    return false;
   }
+
+  var base = defaultFieldBaseline.find(function (x) {
+    return x.id === f.id;
+  });
+
+  if (!base) {
+    return true;
+  }
+
+
+  var keys = [
+    "label",
+    "targetPage",
+    "type",
+    "inputMode",
+    "maxDigits",
+    "maxLetters",
+    "required"
+  ];
+
+
+  return keys.some(function (key) {
+
+    var currentValue =
+      f[key] == null
+        ? null
+        : f[key];
+
+    var baseValue =
+      base[key] == null
+        ? null
+        : base[key];
+
+    return JSON.stringify(currentValue) !==
+      JSON.stringify(baseValue);
+
+  });
+
+}
   function renderFieldList(
   list,
   containerId,
@@ -1436,11 +1493,11 @@
       if (!f) return;
       document.getElementById("fieldModalTitle").textContent = "แก้ไขฟิลด์";
       document.getElementById("cfLabel").value = f.label;
-      document.getElementById('cfPosition').value =
-        f.position || 'end';
+      document.getElementById("cfPosition").value =
+  f.position || "end";
 
-      document.getElementById('cfRequired').checked =
-        !!f.required;
+document.getElementById("cfRequired").checked =
+  !!f.required;
       document.getElementById("cfTargetPage").value = f.targetPage || "both";
 
       // ฟิลด์ระบบประเภทที่ไม่ถูกล็อก (เช่น ถึง/ผู้รับ) สามารถแก้ TargetPage ได้ (Goal 2)
@@ -1472,6 +1529,11 @@
           cfAddOptionRow("");
       }
     } else {
+      document.getElementById("cfPosition").value =
+  "end";
+
+document.getElementById("cfRequired").checked =
+  false;
       document.getElementById("fieldModalTitle").textContent = "เพิ่มฟิลด์ใหม่";
       document.getElementById('cfPosition').value =
   'end';
@@ -1518,6 +1580,11 @@ document.getElementById('cfRequired').checked =
         });
         if (!f) return;
         f.label = label;
+        f.required =
+  document.getElementById("cfRequired").checked;
+
+f.position =
+  document.getElementById("cfPosition").value;
         f.required =
   document.getElementById('cfRequired').checked;
 
