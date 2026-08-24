@@ -104,13 +104,66 @@
             <label>ชื่อฟิลด์ (ป้ายกำกับ)</label>
             <input type="text" id="cfLabel" placeholder="เช่น หมายเลขโครงการ, สถานที่จัดประชุม">
           </div>
-          <div class="field" id="cfTargetPageRow" style="margin-bottom:14px;">
-            <label>แสดงผลในหน้าใด</label>
-            <select id="cfTargetPage">
-              <div class="cf-position-block">
-              <label for="cfPosition">ตำแหน่งในโครงสร้างชื่อไฟล์</label>
-              <select id="cfPosition">
-              <option value="end">ท้ายชื่อไฟล์</option>
+          <div
+  class="field"
+  id="cfTargetPageRow"
+  style="margin-bottom:14px;"
+>
+
+  <label>
+    แสดงผลในหน้าใด
+  </label>
+
+  <select id="cfTargetPage">
+
+    <option value="both">
+      ทุกส่วนของระบบ
+    </option>
+
+    <option value="single">
+      ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท
+    </option>
+
+    <option value="single-draft">
+      ตั้งชื่อไฟล์เดี่ยว — ร่างหนังสือ
+    </option>
+
+    <option value="single-signed">
+      ตั้งชื่อไฟล์เดี่ยว — หนังสือลงนามแล้ว
+    </option>
+
+    <option value="bundle">
+      ชุดเอกสารครบชุด — ทุกส่วน
+    </option>
+
+    <option value="bundle-common">
+      ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง
+    </option>
+
+    <option value="bundle-attachments">
+      ชุดเอกสารครบชุด — เอกสารแนบ
+    </option>
+
+    <option value="bundle-draft-letter">
+      ชุดเอกสารครบชุด — หนังสือร่าง
+    </option>
+
+  </select>
+
+</div>
+
+
+<div class="cf-position-block">
+
+  <label for="cfPosition">
+    ตำแหน่งในโครงสร้างชื่อไฟล์
+  </label>
+
+  <select id="cfPosition">
+
+    <option value="end">
+      ท้ายชื่อไฟล์
+    </option>
 
     <option value="before-dept">
       ก่อนรหัสส่วนราชการ
@@ -143,17 +196,6 @@
     <option value="after-recipient">
       หลังถึง / ผู้รับ
     </option>
-    <div class="cf-checkbox-row">
-
-  <input
-    type="checkbox"
-    id="cfRequired">
-
-  <label for="cfRequired">
-    ฟิลด์นี้บังคับกรอก
-  </label>
-
-</div>
 
   </select>
 
@@ -916,14 +958,14 @@ function isModifiedSystemField(f) {
 
 
   var keys = [
-    "label",
-    "targetPage",
-    "type",
-    "inputMode",
-    "maxDigits",
-    "maxLetters",
-    "required"
-  ];
+  "label",
+  "targetPage",
+  "type",
+  "inputMode",
+  "maxDigits",
+  "maxLetters",
+  "required"
+];
 
 
   return keys.some(function (key) {
@@ -1300,9 +1342,175 @@ function isModifiedSystemField(f) {
     });
 
 }
-  function renderFieldsPage() {
-    var list = loadCustomFields();
+  function renderFieldList(list, containerId, emptyId) {
 
+  var wrap = document.getElementById(containerId);
+  var empty = document.getElementById(emptyId);
+
+  if (!wrap) return;
+
+
+  if (!list || !list.length) {
+
+    wrap.innerHTML = "";
+
+    if (empty) {
+      empty.style.display = "block";
+    }
+
+    return;
+
+  }
+
+
+  if (empty) {
+    empty.style.display = "none";
+  }
+
+
+  var targetText = {
+    both: "ทั้งสองหน้า",
+    single: "ไฟล์เดี่ยว",
+    "single-draft": "ไฟล์เดี่ยว (ร่าง)",
+    "single-signed": "ไฟล์เดี่ยว (ลงนาม)",
+    bundle: "ชุดเอกสาร",
+    "bundle-common": "ชุดเอกสาร (ส่วนกลาง)",
+    "bundle-attachments": "ชุดเอกสาร (เอกสารแนบ)",
+    "bundle-draft-letter": "ชุดเอกสาร (หนังสือร่าง)"
+  };
+
+
+  wrap.innerHTML = list.map(function (f) {
+
+    return `
+      <div class="cf-card">
+
+        <div class="cf-card-head">
+
+          <div>
+
+            <span class="cf-card-title">
+              ${escapeHtml(f.label)}
+            </span>
+
+            <span class="cf-card-type">
+              ${fieldTypeLabel(f)}
+            </span>
+
+            <span class="cf-card-target">
+              ${targetText[f.targetPage || "both"] || "ทั้งสองหน้า"}
+            </span>
+
+            ${f.isSystem
+              ? '<span class="cf-system-badge">ฟิลด์ระบบ</span>'
+              : ''
+            }
+
+            ${f.required
+              ? '<span class="cf-required-badge">บังคับกรอก</span>'
+              : ''
+            }
+
+          </div>
+
+
+          <div class="cf-card-actions">
+
+            <button
+              type="button"
+              data-edit="${f.id}"
+            >
+              แก้ไข
+            </button>
+
+
+            <button
+              type="button"
+              class="danger"
+              data-del="${f.id}"
+            >
+              ลบ
+            </button>
+
+          </div>
+
+        </div>
+
+
+        ${f.type === "select"
+          ? `
+            <div class="cf-options-wrap">
+
+              ${(f.options || []).map(function (o) {
+                return `
+                  <span class="cf-chip">
+                    ${escapeHtml(o)}
+                  </span>
+                `;
+              }).join("")}
+
+            </div>
+          `
+          : ""
+        }
+
+
+      </div>
+    `;
+
+  }).join("");
+
+
+  wrap
+    .querySelectorAll("[data-edit]")
+    .forEach(function (btn) {
+
+      btn.addEventListener("click", function () {
+
+        openFieldModal(btn.dataset.edit);
+
+      });
+
+    });
+
+
+  wrap
+    .querySelectorAll("[data-del]")
+    .forEach(function (btn) {
+
+      btn.addEventListener("click", function () {
+
+        var field = loadCustomFields().find(function (f) {
+          return f.id === btn.dataset.del;
+        });
+
+        if (!field) return;
+
+
+        document.getElementById("delFieldId").value =
+          field.id;
+
+        document.getElementById("delFieldName").textContent =
+          field.label;
+
+        document.getElementById("delActionType").value =
+          "trash";
+
+        document.getElementById("delTargetWrap").style.display =
+          "none";
+
+        document.getElementById("delTargetPage").value =
+          field.targetPage || "both";
+
+        document
+          .getElementById("deleteFieldModal")
+          .classList.add("open");
+
+      });
+
+    });
+
+}
     // =================================
     // 1. ฟิลด์เริ่มต้นของระบบ
     // =================================
