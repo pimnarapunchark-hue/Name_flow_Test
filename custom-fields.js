@@ -140,6 +140,10 @@
       ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง
     </option>
 
+    <option value="bundle-memo">
+      ชุดเอกสารครบชุด — บันทึก (เอกสารหลักที่เสนอ)
+    </option>
+
     <option value="bundle-attachments">
       ชุดเอกสารครบชุด — เอกสารแนบ
     </option>
@@ -214,16 +218,6 @@
   </label>
 
 </div>
-              <option value="both">ทุกส่วนของระบบ</option>
-              <option value="single">ตั้งชื่อไฟล์เดี่ยว — ทุกประเภท</option>
-              <option value="single-draft">ตั้งชื่อไฟล์เดี่ยว — ร่างหนังสือ</option>
-              <option value="single-signed">ตั้งชื่อไฟล์เดี่ยว — หนังสือลงนามแล้ว</option>
-              <option value="bundle">ชุดเอกสารครบชุด — ทุกส่วน</option>
-              <option value="bundle-common">ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง</option>
-              <option value="bundle-attachments">ชุดเอกสารครบชุด — เอกสารแนบ</option>
-              <option value="bundle-draft-letter">ชุดเอกสารครบชุด — หนังสือ(ร่าง)</option>
-            </select>
-          </div>
           <div class="field" id="cfTypeRow" style="margin-bottom:14px;">
             <label>ประเภทฟิลด์</label>
             <select id="cfType">
@@ -298,6 +292,7 @@
               <option value="single-signed">ตั้งชื่อไฟล์เดี่ยว — หนังสือลงนามแล้ว</option>
               <option value="bundle">ชุดเอกสารครบชุด — ทุกส่วน</option>
               <option value="bundle-common">ชุดเอกสารครบชุด — ข้อมูลส่วนกลาง</option>
+              <option value="bundle-memo">ชุดเอกสารครบชุด — บันทึก (เอกสารหลักที่เสนอ)</option>
               <option value="bundle-attachments">ชุดเอกสารครบชุด — เอกสารแนบ</option>
               <option value="bundle-draft-letter">ชุดเอกสารครบชุด — หนังสือ(ร่าง)</option>
             </select>
@@ -1036,6 +1031,9 @@ function renderFieldList(
 
     "bundle-common":
       "ชุดเอกสาร (ข้อมูลส่วนกลาง)",
+
+    "bundle-memo":
+      "ชุดเอกสาร (บันทึก-เอกสารหลักที่เสนอ)",
 
     "bundle-attachments":
       "ชุดเอกสาร (เอกสารแนบ)",
@@ -1856,11 +1854,13 @@ position:
         if (page === "bundle") {
           return (
             target === "bundle-common" ||
+            target === "bundle-memo" ||
             target === "bundle-attachments" ||
             target === "bundle-draft-letter"
           );
         }
         if (page === "bundle-common") return target === "bundle-common";
+        if (page === "bundle-memo") return target === "bundle-memo";
         if (page === "bundle-attachments")
           return target === "bundle-attachments";
         if (page === "bundle-draft-letter")

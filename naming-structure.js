@@ -1,119 +1,210 @@
 (function () {
 
-  const STORAGE_KEY =
-    "nameflow_naming_structure";
+  /* =========================================================
+     จัดการโครงสร้างการตั้งชื่อไฟล์ — แยกตามส่วนจริงของระบบ
+     (ต้องตรงกับ data-cf-target ในหน้า index.html และ
+     ตัวเลือก "แสดงผลในหน้าใด" ใน custom-fields.js)
+     ========================================================= */
 
+  const STORAGE_PREFIX = "nameflow_naming_structure__";
+  const OLD_STORAGE_KEY = "nameflow_naming_structure"; // key เดิม (ก่อนแยกตามส่วน)
+  const MIGRATION_FLAG = "nameflow_naming_structure_migrated_v2";
 
-  const defaultStructure = [
+  /* ---------- 1) รายชื่อ "ส่วน" ของระบบที่มีโครงสร้างชื่อไฟล์เป็นของตัวเอง ---------- */
+
+  const structureContexts = [
 
     {
-      id: "date",
-      label: "วันที่ของเอกสาร",
-      enabled: true
+      id: "single",
+      label: "ไฟล์เดี่ยว — ทุกประเภท"
     },
 
     {
-      id: "doctype",
-      label: "ประเภทเอกสาร",
-      enabled: true
+      id: "single-draft",
+      label: "ไฟล์เดี่ยว — ร่างหนังสือ"
     },
 
     {
-      id: "division",
-      label: "กอง / ศูนย์ / กลุ่ม",
-      enabled: true
+      id: "single-signed",
+      label: "ไฟล์เดี่ยว — หนังสือลงนามแล้ว"
     },
 
     {
-      id: "dept",
-      label: "กลุ่มงาน / ฝ่าย",
-      enabled: true
+      id: "bundle-common",
+      label: "ชุดเอกสาร — ข้อมูลส่วนกลาง"
     },
 
     {
-      id: "dept-code",
-      label: "รหัสส่วนราชการ",
-      enabled: true
+      id: "bundle-memo",
+      label: "ชุดเอกสาร — บันทึก(เอกสารหลักที่เสนอ)"
     },
 
     {
-      id: "order",
-      label: "ลำดับหนังสือส่งออก",
-      enabled: true
+      id: "bundle-attachments",
+      label: "ชุดเอกสาร — เอกสารแนบ"
     },
 
     {
-      id: "letter-no",
-      label: "เลขที่หนังสือส่งออก",
-      enabled: true
-    },
-
-    {
-      id: "title",
-      label: "ชื่อเรื่อง",
-      enabled: true
-    },
-
-    {
-      id: "recipient",
-      label: "ถึง / ผู้รับ",
-      enabled: true
+      id: "bundle-draft-letter",
+      label: "ชุดเอกสาร — หนังสือ(ร่าง)"
     }
 
   ];
 
+  /* ---------- 2) โครงสร้างเริ่มต้นของแต่ละส่วน ---------- */
+  /* อิงตามฟิลด์ที่ใช้จริงในแต่ละส่วนของหน้า "ตั้งชื่อไฟล์" */
 
-  function loadStructure() {
+  const fieldCatalog = {
+    date:       "วันที่ของเอกสาร",
+    doctype:    "ประเภทเอกสาร",
+    division:   "กอง / ศูนย์ / กลุ่ม",
+    dept:       "กลุ่มงาน / ฝ่าย",
+    "dept-code":"รหัสส่วนราชการ",
+    order:      "ลำดับหนังสือส่งออก",
+    "letter-no":"เลขที่หนังสือส่งออก",
+    session:    "ครั้งที่",
+    signer:     "ผู้มีอำนาจลงนาม (S)",
+    title:      "ชื่อเรื่อง",
+    recipient:  "ถึง / ผู้รับ"
+  };
+
+  function field(id) {
+    return { id: id, label: fieldCatalog[id], enabled: true };
+  }
+
+  const defaultStructures = {
+
+    single: [
+      field("date"),
+      field("division"),
+      field("dept"),
+      field("doctype"),
+      field("signer"),
+      field("title"),
+      field("recipient")
+    ],
+
+    "single-draft": [
+      field("date"),
+      field("dept-code"),
+      field("order"),
+      field("signer"),
+      field("title"),
+      field("recipient")
+    ],
+
+    "single-signed": [
+      field("date"),
+      field("dept-code"),
+      field("letter-no"),
+      field("order"),
+      field("recipient")
+    ],
+
+    "bundle-common": [
+      field("date"),
+      field("division"),
+      field("dept"),
+      field("session")
+    ],
+
+    "bundle-memo": [
+      field("signer"),
+      field("recipient"),
+      field("title")
+    ],
+
+    "bundle-attachments": [
+      field("doctype"),
+      field("title")
+    ],
+
+    "bundle-draft-letter": [
+      field("dept-code"),
+      field("order"),
+      field("signer"),
+      field("recipient"),
+      field("title")
+    ]
+
+  };
+
+  /* ---------- 3) สถานะแท็บที่กำลังเปิดอยู่ ---------- */
+
+  let activeContext = structureContexts[0].id;
+
+  /* ---------- 4) Storage ---------- */
+
+  function storageKey(contextId) {
+    return STORAGE_PREFIX + contextId;
+  }
+
+  function migrateOldStructureOnce() {
+
+    if (localStorage.getItem(MIGRATION_FLAG)) return;
 
     try {
 
-      const saved =
-        JSON.parse(
-          localStorage.getItem(
-            STORAGE_KEY
-          )
+      const old = JSON.parse(
+        localStorage.getItem(OLD_STORAGE_KEY)
+      );
+
+      if (Array.isArray(old) && old.length) {
+        // ค่าที่บันทึกไว้แบบเดิม ใช้เป็นค่าเริ่มต้นของ "ไฟล์เดี่ยว — ทุกประเภท"
+        localStorage.setItem(
+          storageKey("single"),
+          JSON.stringify(old)
         );
+      }
 
+    } catch (error) {}
 
-      if (
-        Array.isArray(saved) &&
-        saved.length
-      ) {
+    localStorage.setItem(MIGRATION_FLAG, "1");
+
+  }
+
+  function loadStructure(contextId) {
+
+    migrateOldStructureOnce();
+
+    try {
+
+      const saved = JSON.parse(
+        localStorage.getItem(storageKey(contextId))
+      );
+
+      if (Array.isArray(saved) && saved.length) {
         return saved;
       }
 
     } catch (error) {}
 
+    const fallback = defaultStructures[contextId] || [];
 
-    return JSON.parse(
-      JSON.stringify(
-        defaultStructure
-      )
-    );
+    return JSON.parse(JSON.stringify(fallback));
 
   }
 
-
-  function saveStructure(list) {
+  function saveStructure(contextId, list) {
 
     localStorage.setItem(
-      STORAGE_KEY,
+      storageKey(contextId),
       JSON.stringify(list)
     );
 
   }
 
-
-  function resetStructure() {
+  function resetStructure(contextId) {
 
     localStorage.removeItem(
-      STORAGE_KEY
+      storageKey(contextId)
     );
 
     renderStructurePage();
 
   }
 
+  /* ---------- 5) Render ---------- */
 
   function renderStructurePage() {
 
@@ -122,13 +213,7 @@
         "page-structure"
       );
 
-
     if (!host) return;
-
-
-    const list =
-      loadStructure();
-
 
     host.innerHTML = `
 
@@ -157,21 +242,30 @@
         <div class="cf-page-intro">
 
           กำหนดลำดับของข้อมูลที่ใช้ในการสร้างชื่อไฟล์
+          แยกตามแต่ละส่วนของระบบ เนื่องจากแต่ละส่วนใช้ข้อมูล
+          และรูปแบบชื่อไฟล์ที่ไม่เหมือนกัน
 
           <br><br>
 
-          สามารถเปิดหรือปิดฟิลด์
-          และเลื่อนลำดับก่อนหรือหลังได้
+          เลือกส่วนที่ต้องการจัดการโครงสร้างจากแท็บด้านล่าง
+          จากนั้นสามารถเปิดหรือปิดฟิลด์ และเลื่อนลำดับก่อน/หลังได้
 
           <br><br>
 
           การตั้งค่านี้ใช้สำหรับกำหนด
-          <b>โครงสร้างหลักของชื่อไฟล์</b>
-
+          <b>โครงสร้างหลักของชื่อไฟล์ในแต่ละส่วน</b>
           ส่วนฟิลด์เพิ่มเติมจะสามารถเลือกตำแหน่ง
           เพื่อแทรกเข้าไปในโครงสร้างนี้ได้
+          (กำหนดที่หน้า "จัดการฟิลด์เพิ่มเติม" โดยเลือก
+          "แสดงผลในหน้าใด" ให้ตรงกับส่วนเดียวกันนี้)
 
         </div>
+
+
+        <div
+          id="structureTabs"
+          class="ns-tabs"
+        ></div>
 
 
         <div
@@ -218,7 +312,7 @@
             id="resetStructureBtn"
             type="button"
           >
-            คืนค่าเริ่มต้น
+            คืนค่าเริ่มต้น (เฉพาะส่วนนี้)
           </button>
 
         </div>
@@ -227,12 +321,66 @@
 
     `;
 
+    renderTabs();
+    renderList();
+
+  }
+
+  function renderTabs() {
+
+    const tabWrap =
+      document.getElementById(
+        "structureTabs"
+      );
+
+    if (!tabWrap) return;
+
+    tabWrap.innerHTML = structureContexts
+      .map(function (ctx) {
+
+        return `
+          <button
+            type="button"
+            class="ns-tab${ctx.id === activeContext ? " active" : ""}"
+            data-context="${ctx.id}"
+          >
+            ${ctx.label}
+          </button>
+        `;
+
+      })
+      .join("");
+
+    tabWrap
+      .querySelectorAll("[data-context]")
+      .forEach(function (btn) {
+
+        btn.addEventListener("click", function () {
+
+          activeContext = btn.dataset.context;
+
+          renderTabs();
+          renderList();
+
+        });
+
+      });
+
+  }
+
+  function renderList() {
 
     const wrap =
       document.getElementById(
         "structureList"
       );
 
+    if (!wrap) return;
+
+    const list =
+      loadStructure(activeContext);
+
+    wrap.innerHTML = "";
 
     list.forEach(
       function (
@@ -352,7 +500,7 @@
             function () {
 
               const list =
-                loadStructure();
+                loadStructure(activeContext);
 
 
               const item =
@@ -372,6 +520,7 @@
 
 
               saveStructure(
+                activeContext,
                 list
               );
 
@@ -399,7 +548,7 @@
             function () {
 
               const list =
-                loadStructure();
+                loadStructure(activeContext);
 
 
               const index =
@@ -425,11 +574,12 @@
 
 
                 saveStructure(
+                  activeContext,
                   list
                 );
 
 
-                renderStructurePage();
+                renderList();
 
               }
 
@@ -454,7 +604,7 @@
             function () {
 
               const list =
-                loadStructure();
+                loadStructure(activeContext);
 
 
               const index =
@@ -483,11 +633,12 @@
 
 
                 saveStructure(
+                  activeContext,
                   list
                 );
 
 
-                renderStructurePage();
+                renderList();
 
               }
 
@@ -499,38 +650,38 @@
       );
 
 
-    document
-      .getElementById(
+    const saveBtn =
+      document.getElementById(
         "saveStructureBtn"
-      )
-      .addEventListener(
-        "click",
-
-        function () {
-
-          alert(
-            "บันทึกโครงสร้างการตั้งชื่อไฟล์เรียบร้อย"
-          );
-
-        }
-
       );
 
+    if (saveBtn) {
 
-    document
-      .getElementById(
+      saveBtn.onclick = function () {
+
+        alert(
+          "บันทึกโครงสร้างการตั้งชื่อไฟล์เรียบร้อย"
+        );
+
+      };
+
+    }
+
+
+    const resetBtn =
+      document.getElementById(
         "resetStructureBtn"
-      )
-      .addEventListener(
-        "click",
-
-        function () {
-
-          resetStructure();
-
-        }
-
       );
+
+    if (resetBtn) {
+
+      resetBtn.onclick = function () {
+
+        resetStructure(activeContext);
+
+      };
+
+    }
 
   }
 
@@ -547,7 +698,7 @@
 
 
     const list =
-      loadStructure()
+      loadStructure(activeContext)
         .filter(
           item =>
             item.enabled
@@ -587,12 +738,30 @@
 
   }
 
+  /* ---------- 6) CSS สำหรับแท็บ ---------- */
+
+  var style = document.createElement("style");
+  style.textContent = `
+    .ns-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:4px;}
+    .ns-tab{flex:0 0 auto;white-space:nowrap;background:var(--teal-100);color:var(--teal-700);border:none;padding:9px 14px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;}
+    .ns-tab:hover{opacity:.85;}
+    .ns-tab.active{background:var(--teal-700);color:#fff;}
+  `;
+  document.head.appendChild(style);
+
 
   window.renderStructurePage =
     renderStructurePage;
 
 
-  window.getNamingStructure =
-    loadStructure;
+  /* getNamingStructure(contextId?) — ไม่ระบุ = ใช้ context "single" */
+  window.getNamingStructure = function (contextId) {
+    return loadStructure(contextId || "single");
+  };
+
+  /* รายชื่อ context ทั้งหมด เผื่อไฟล์อื่นต้องใช้ */
+  window.getNamingStructureContexts = function () {
+    return structureContexts.slice();
+  };
 
 })();
