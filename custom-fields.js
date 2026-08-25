@@ -651,11 +651,9 @@
       isSystem: true,
       locked: false,
 
-required:
-  document.getElementById("cfRequired").checked,
+required: false,
 
-position:
-  document.getElementById("cfPosition").value,
+position: "end",
     },
     {
       id: "sys_order",
@@ -668,11 +666,9 @@ position:
       isSystem: true,
       locked: false,
 
-required:
-  document.getElementById("cfRequired").checked,
+required: false,
 
-position:
-  document.getElementById("cfPosition").value,
+position: "end",
     },
     {
       id: "sys_letterno",
@@ -685,11 +681,9 @@ position:
       isSystem: true,
       locked: false,
 
-required:
-  document.getElementById("cfRequired").checked,
+required: false,
 
-position:
-  document.getElementById("cfPosition").value,
+position: "end",
     },
     {
       id: "sys_title",
@@ -702,11 +696,9 @@ position:
       isSystem: true,
       locked: false,
 
-required:
-  document.getElementById("cfRequired").checked,
+required: false,
 
-position:
-  document.getElementById("cfPosition").value,
+position: "end",
     },
     {
       id: "sys_session",
@@ -719,11 +711,9 @@ position:
       isSystem: true,
       locked: false,
 
-required:
-  document.getElementById("cfRequired").checked,
+required: false,
 
-position:
-  document.getElementById("cfPosition").value,
+position: "end",
     },
     {
       id: "sys_to",
@@ -736,11 +726,9 @@ position:
       isSystem: true,
       locked: false,
 
-required:
-  document.getElementById("cfRequired").checked,
+required: false,
 
-position:
-  document.getElementById("cfPosition").value,
+position: "end",
     },
     {
       id: "sys_signer",
@@ -753,18 +741,23 @@ position:
       isSystem: true,
       locked: false,
 
-required:
-  document.getElementById("cfRequired").checked,
+required: false,
 
-position:
-  document.getElementById("cfPosition").value,
+position: "end",
     },
   ];
 
   // เก็บค่าฟิลด์เริ่มต้นไว้
   // เพื่อใช้เปรียบเทียบว่าฟิลด์ระบบถูกแก้ไขหรือไม่
-
-  var defaultFieldBaseline = JSON.parse(JSON.stringify(defaultFields));
+  // สำคัญ: ต้อง normalize ก่อน เพื่อให้ค่า default ที่ normalizeField()
+  // เติมให้ (inputMode, maxDigits, maxLetters ฯลฯ) ตรงกับฟิลด์ที่โหลดมาจาก
+  // localStorage เสมอ ไม่งั้นฟิลด์ที่ไม่เคยถูกแก้ไขเลยจะถูกเข้าใจผิดว่า
+  // "ถูกแก้ไข" เพราะ key บางตัวไม่มีอยู่ใน object literal ต้นฉบับ
+  var defaultFieldBaseline = JSON.parse(JSON.stringify(defaultFields)).map(
+    function (f) {
+      return normalizeField(Object.assign({}, f));
+    },
+  );
 
   var systemFieldBindings = {
     sys_date: { inputId: "f-date", fieldId: "field-date" },
@@ -957,8 +950,13 @@ function isModifiedSystemField(f) {
   });
 
   if (!base) {
-    return true;
+    return false;
   }
+
+  /*
+    ตรวจเฉพาะข้อมูลที่ผู้ใช้แก้ไขได้จริง
+    ห้ามเอา position หรือ locked มาเปรียบเทียบ
+  */
 
   var keys = [
     "label",
@@ -967,25 +965,20 @@ function isModifiedSystemField(f) {
     "inputMode",
     "maxDigits",
     "maxLetters",
-    "required"
+    "required",
+    "options"
   ];
 
   return keys.some(function (key) {
 
     var currentValue =
-      f[key] == null
-        ? null
-        : f[key];
+      f[key] == null ? null : f[key];
 
     var baseValue =
-      base[key] == null
-        ? null
-        : base[key];
+      base[key] == null ? null : base[key];
 
-    return (
-      JSON.stringify(currentValue) !==
-      JSON.stringify(baseValue)
-    );
+    return JSON.stringify(currentValue) !==
+           JSON.stringify(baseValue);
 
   });
 
