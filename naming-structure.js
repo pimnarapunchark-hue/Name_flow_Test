@@ -59,7 +59,8 @@
     doctype:    "ประเภทเอกสาร",
     division:   "กอง / ศูนย์ / กลุ่ม",
     dept:       "กลุ่มงาน / ฝ่าย",
-    "dept-code":"รหัสส่วนราชการ",
+    "office-abbr":"ตัวย่อส่วนราชการ",
+    "dept-code":"เลขประจำส่วนราชการ",
     order:      "ลำดับหนังสือส่งออก",
     "letter-no":"เลขที่หนังสือส่งออก",
     session:    "ครั้งที่",
@@ -86,6 +87,7 @@
 
     "single-draft": [
       field("date"),
+      field("office-abbr"),
       field("dept-code"),
       field("order"),
       field("signer"),
@@ -95,6 +97,7 @@
 
     "single-signed": [
       field("date"),
+      field("office-abbr"),
       field("dept-code"),
       field("letter-no"),
       field("order"),
@@ -120,6 +123,7 @@
     ],
 
     "bundle-draft-letter": [
+      field("office-abbr"),
       field("dept-code"),
       field("order"),
       field("signer"),

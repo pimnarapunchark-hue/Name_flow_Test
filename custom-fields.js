@@ -170,11 +170,11 @@
     </option>
 
     <option value="before-dept">
-      ก่อนรหัสส่วนราชการ
+      ก่อนเลขประจำส่วนราชการ
     </option>
 
     <option value="after-dept">
-      หลังรหัสส่วนราชการ
+      หลังเลขประจำส่วนราชการ
     </option>
 
     <option value="after-order">
@@ -637,7 +637,7 @@
     /* --- ฟิลด์ข้อความ แก้ไข/ลบ/ซ่อน ได้ (ไม่ล็อคโครงสร้าง) --- */
     {
       id: "sys_mdes",
-      label: "รหัสส่วนราชการ",
+      label: "เลขประจำส่วนราชการ",
       targetPage: "both",
       type: "text",
       inputMode: "any",
