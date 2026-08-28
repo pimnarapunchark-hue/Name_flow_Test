@@ -544,6 +544,231 @@
       </button>
       <div class="sidebar-foot">เข้าสู่ระบบในฐานะ<br><b id="sidebarUserLabel">—</b></div>
     </div>
+    <!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="adminLoginModal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+
+        <svg viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             style="width:20px;height:20px;">
+
+          <path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/>
+
+        </svg>
+
+        เข้าสู่ระบบผู้ดูแล
+
+      </div>
+
+      <button
+        class="modal-close"
+        type="button"
+        onclick="closeModal('adminLoginModal')">
+
+        ✕
+
+      </button>
+
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="adminLoginModal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+
+        <svg viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             style="width:20px;height:20px;">
+
+          <path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/>
+
+        </svg>
+
+        เข้าสู่ระบบผู้ดูแล
+
+      </div>
+
+      <button
+        class="modal-close"
+        type="button"
+        onclick="closeModal('adminLoginModal')">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="field"
+           style="margin-bottom:14px;">
+
+        <label>ชื่อผู้ใช้งาน</label>
+
+        <input
+          type="text"
+          id="adminUsername"
+          placeholder="กรอกชื่อผู้ใช้งานแอดมิน">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>รหัสผ่าน</label>
+
+        <input
+          type="password"
+          id="adminPassword"
+          placeholder="กรอกรหัสผ่าน">
+
+      </div>
+
+
+      <div
+        id="adminLoginError"
+        style="
+          display:none;
+          margin-top:14px;
+          padding:10px;
+          border-radius:8px;
+          background:#fdeceb;
+          color:#d1584c;
+          font-size:13px;
+        ">
+      </div>
+
+    </div>
+
+
+    <div class="modal-foot">
+
+      <button
+        class="btn-ghost"
+        type="button"
+        onclick="closeModal('adminLoginModal')">
+
+        ยกเลิก
+
+      </button>
+
+
+      <button
+        class="btn-ghost solid"
+        type="button"
+        id="adminLoginBtn">
+
+        เข้าสู่ระบบ
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+    <div class="modal-body">
+
+      <div class="field"
+           style="margin-bottom:14px;">
+
+        <label>ชื่อผู้ใช้งาน</label>
+
+        <input
+          type="text"
+          id="adminUsername"
+          placeholder="กรอกชื่อผู้ใช้งานแอดมิน">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>รหัสผ่าน</label>
+
+        <input
+          type="password"
+          id="adminPassword"
+          placeholder="กรอกรหัสผ่าน">
+
+      </div>
+
+
+      <div
+        id="adminLoginError"
+        style="
+          display:none;
+          margin-top:14px;
+          padding:10px;
+          border-radius:8px;
+          background:#fdeceb;
+          color:#d1584c;
+          font-size:13px;
+        ">
+      </div>
+
+    </div>
+
+
+    <div class="modal-foot">
+
+      <button
+        class="btn-ghost"
+        type="button"
+        onclick="closeModal('adminLoginModal')">
+
+        ยกเลิก
+
+      </button>
+
+
+      <button
+        class="btn-ghost solid"
+        type="button"
+        id="adminLoginBtn">
+
+        เข้าสู่ระบบ
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+    <button class="nav-item" id="adminLoginNav">
+  <svg viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="2">
+    <path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/>
+  </svg>
+
+  <span class="label">ผู้ดูแลระบบ</span>
+
+  <span class="nav-badge"
+        id="adminNavBadge"
+        style="display:none;">
+    0
+  </span>
+</button>
 
     <div class="main">
       <!-- HOME -->
@@ -1624,6 +1849,15 @@
         <div class="page-title-row">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg>
           <div class="page-title">ศูนย์จัดการข้อความ (สำหรับแอดมิน)</div>
+          <button
+  class="btn-ghost"
+  type="button"
+  id="adminLogoutBtn"
+  style="margin-left:auto;">
+
+  ออกจากระบบผู้ดูแล
+
+</button>
         </div>
         <div class="admin-tabs">
           <button class="admin-tab-btn active" data-atab="contact">ข้อความติดต่อสอบถาม <span class="count" id="adminContactCount">0</span></button>
@@ -1863,20 +2097,60 @@ function initials(name){
   return (parts[0][0]+parts[1][0]).toUpperCase();
 }
 
-function loginSuccess(username,name,role){
-  currentUser={username,name:name||username,role:role||'user'};
-  document.getElementById('authView').style.display='none';
-  document.getElementById('appView').style.display='flex';
-  document.getElementById('userChipName').textContent=currentUser.name;
-  document.getElementById('userAvatar').textContent=initials(currentUser.name);
-  document.getElementById('userMenuName').textContent=currentUser.name;
-  document.getElementById('sidebarUserLabel').textContent=currentUser.name;
-  document.getElementById('homeWelcome').textContent=`สวัสดี ${currentUser.name} ยินดีต้อนรับกลับสู่ระบบ`;
-  const adminNav=document.getElementById('adminNavItem');
-  adminNav.style.display=currentUser.role==='admin'?'flex':'none';
-  if(currentUser.role==='admin')updateAdminBadge();
-  goPage('home');
-  loadHistory();
+function updateAdminBadge(){
+
+  if (!isAdmin) return;
+
+
+  const contactCount =
+    loadContactMessages()
+      .filter(function(message){
+
+        return message.status === "new";
+
+      })
+      .length;
+
+
+  const reportCount =
+    loadBugReports()
+      .filter(function(report){
+
+        return report.status === "new";
+
+      })
+      .length;
+
+
+  const unread =
+    contactCount +
+    reportCount;
+
+
+  const badge =
+    document.getElementById(
+      "adminNavBadge"
+    );
+
+
+  if (!badge) return;
+
+
+  if (unread > 0) {
+
+    badge.style.display =
+      "inline-block";
+
+    badge.textContent =
+      unread;
+
+  } else {
+
+    badge.style.display =
+      "none";
+
+  }
+
 }
 
 document.getElementById('userChip').addEventListener('click',e=>{
@@ -1983,16 +2257,70 @@ setupPasswordToggle('toggleRegPasswordBtn','regPassword','eyeIconReg');
 const navItems=document.querySelectorAll('.nav-item');
 const pages=document.querySelectorAll('.main > .page');
 function goPage(name){
-  if(name==='admin'&&(!currentUser||currentUser.role!=='admin')){alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');name='home';}
-  navItems.forEach(n=>n.classList.toggle('active',n.dataset.page===name));
-  pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+name));
-  document.getElementById('globalFooterBar').style.display=(name==='admin')?'none':'flex';
-  if(name==='history')loadHistory();
-  if(name==='admin')renderAdminAll();
-  if(name==='settings'){
-    if(window.renderFieldsPage)renderFieldsPage();
-    if(window.renderStructurePage)renderStructurePage();
+
+  /*
+    ถ้าจะเข้า Adminแต่ยังไม่ได้ Login*/
+
+  if (name === "admin" && !isAdmin) {
+  openModal("adminLoginModal");
+    return;
   }
+
+  navItems.forEach(function(nav){nav.classList.toggle("active",nav.dataset.page === name);
+  });
+
+  pages.forEach(function(page){page.classList.toggle("active",page.id === "page-" + name);
+  });
+
+  /*ซ่อน Footer เมื่ออยู่หน้า Admin*/
+
+  const footer = document.getElementById("globalFooterBar"
+    );
+
+    if (footer) {
+
+    footer.style.display =name === "admin"
+        ? "none"
+        : "flex";
+
+  }
+
+
+  /*โหลดประวัติ*/
+  if (name === "history") {loadHistory();
+  }
+
+
+  /*โหลดข้อมูล Admin*/
+
+  if (name === "admin") {
+
+    renderAdminAll();
+
+  }
+
+
+  /*หน้า Settings*/
+
+  if (
+    name === "fields" &&
+    window.renderFieldsPage
+  ) {
+
+    renderFieldsPage();
+
+  }
+
+
+  if (
+    name === "structure" &&
+    window.renderStructurePage
+  ) {
+
+    renderStructurePage();
+
+  }
+
 }
 navItems.forEach(n=>n.addEventListener('click',()=>goPage(n.dataset.page)));
 document.querySelectorAll('[data-settings-tab]').forEach(btn=>btn.addEventListener('click',()=>{
@@ -3070,6 +3398,131 @@ function loadHistory(filter){
 document.getElementById('historySearch').addEventListener('input',e=>loadHistory(e.target.value));
 
 /* =========================================================
+   ADMIN LOGIN
+========================================================= */
+
+/*
+  เปลี่ยน username และ password ตรงนี้ได้
+*/
+
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "123456";
+
+
+let isAdmin = false;
+
+
+/* เปิดหน้า Login Admin */
+
+document
+  .getElementById("adminLoginNav")
+  .addEventListener("click", function () {
+
+    if (isAdmin) {
+
+      goPage("admin");
+
+      return;
+
+    }
+
+    document
+      .getElementById("adminLoginModal")
+      .classList
+      .add("open");
+
+  });
+
+
+
+/* ปุ่มเข้าสู่ระบบ Admin */
+
+document
+  .getElementById("adminLoginBtn")
+  .addEventListener("click", function () {
+
+    const username =
+      document
+        .getElementById("adminUsername")
+        .value
+        .trim();
+
+    const password =
+      document
+        .getElementById("adminPassword")
+        .value;
+
+    const error =
+      document
+        .getElementById("adminLoginError");
+
+
+    error.style.display = "none";
+
+
+    /* ตรวจสอบ Username */
+
+    if (
+      username !== ADMIN_USERNAME ||
+      password !== ADMIN_PASSWORD
+    ) {
+
+      error.textContent =
+        "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
+
+      error.style.display = "block";
+
+      return;
+
+    }
+
+
+    /* Login สำเร็จ */
+
+    isAdmin = true;
+
+
+    document
+      .getElementById("adminUsername")
+      .value = "";
+
+
+    document
+      .getElementById("adminPassword")
+      .value = "";
+
+
+    closeModal("adminLoginModal");
+
+
+    alert("เข้าสู่ระบบผู้ดูแลเรียบร้อย");
+
+
+    goPage("admin");
+
+
+    updateAdminBadge();
+
+
+    document
+  .getElementById("adminLogoutBtn")
+  .addEventListener("click", function () {
+
+    isAdmin = false;
+
+
+    alert(
+      "ออกจากระบบผู้ดูแลเรียบร้อย"
+    );
+
+
+    goPage("home");
+
+  });
+
+  });
+
+/* =========================================================
    SET MODE (๔.๓) — ชุดเอกสารครบชุด
    ========================================================= */
 
@@ -3328,6 +3781,7 @@ document.getElementById('setResetBtn').addEventListener('click',function(){
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+
 
 <script src="custom-fields.js"></script>
 <script src="naming-structure.js"></script>
