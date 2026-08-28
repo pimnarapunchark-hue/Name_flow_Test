@@ -523,6 +523,15 @@ body{
   }
 }
 
+
+/* FINAL LAYOUT OVERRIDE */
+html,body{width:100%;height:100%;overflow-x:hidden;}
+#appView{width:100%;min-width:0;}
+.body-row{display:flex;width:100%;min-width:0;align-items:stretch;}
+.sidebar{flex:0 0 216px;width:216px;min-width:216px;}
+.main{flex:1 1 0;min-width:0;width:0;max-width:none;}
+.main > .page{width:100%;min-width:0;max-width:100%;}
+.home-card{width:100%;}
 </style>
   <meta property="og:title" content="NAMEFLOW">
 
@@ -674,239 +683,13 @@ body{
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><circle cx="12" cy="8" r=".6" fill="currentColor"/></svg>
         <span class="label">วิธีการใช้งาน</span>
       </button>
-      <button class="nav-item" data-page="admin" id="adminNavItem" style="display:none;">
+      <div class="sidebar-foot">เข้าสู่ระบบในฐานะ<br><b id="sidebarUserLabel">—</b></div>
+      <button class="nav-item" id="adminLoginNav" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg>
-        <span class="label">จัดการข้อความ (แอดมิน)</span>
+        <span class="label">ผู้ดูแลระบบ</span>
         <span class="nav-badge" id="adminNavBadge" style="display:none;">0</span>
       </button>
-      <div class="sidebar-foot">เข้าสู่ระบบในฐานะ<br><b id="sidebarUserLabel">—</b></div>
     </div>
-    <!-- ADMIN LOGIN MODAL -->
-<div class="modal-overlay" id="adminLoginModal">
-
-  <div class="modal-card">
-
-    <div class="modal-head">
-
-      <div class="modal-title">
-
-        <svg viewBox="0 0 24 24"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="2"
-             style="width:20px;height:20px;">
-
-          <path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/>
-
-        </svg>
-
-        เข้าสู่ระบบผู้ดูแล
-
-      </div>
-
-      <button
-        class="modal-close"
-        type="button"
-        onclick="closeModal('adminLoginModal')">
-
-        ✕
-
-      </button>
-
-    </div>
-
-    <!-- ADMIN LOGIN MODAL -->
-<div class="modal-overlay" id="adminLoginModal">
-
-  <div class="modal-card">
-
-    <div class="modal-head">
-
-      <div class="modal-title">
-
-        <svg viewBox="0 0 24 24"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="2"
-             style="width:20px;height:20px;">
-
-          <path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/>
-
-        </svg>
-
-        เข้าสู่ระบบผู้ดูแล
-
-      </div>
-
-      <button
-        class="modal-close"
-        type="button"
-        onclick="closeModal('adminLoginModal')">
-
-        ✕
-
-      </button>
-
-    </div>
-
-
-    <div class="modal-body">
-
-      <div class="field"
-           style="margin-bottom:14px;">
-
-        <label>ชื่อผู้ใช้งาน</label>
-
-        <input
-          type="text"
-          id="adminUsername"
-          placeholder="กรอกชื่อผู้ใช้งานแอดมิน">
-
-      </div>
-
-
-      <div class="field">
-
-        <label>รหัสผ่าน</label>
-
-        <input
-          type="password"
-          id="adminPassword"
-          placeholder="กรอกรหัสผ่าน">
-
-      </div>
-
-
-      <div
-        id="adminLoginError"
-        style="
-          display:none;
-          margin-top:14px;
-          padding:10px;
-          border-radius:8px;
-          background:#fdeceb;
-          color:#d1584c;
-          font-size:13px;
-        ">
-      </div>
-
-    </div>
-
-
-    <div class="modal-foot">
-
-      <button
-        class="btn-ghost"
-        type="button"
-        onclick="closeModal('adminLoginModal')">
-
-        ยกเลิก
-
-      </button>
-
-
-      <button
-        class="btn-ghost solid"
-        type="button"
-        id="adminLoginBtn">
-
-        เข้าสู่ระบบ
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-    <div class="modal-body">
-
-      <div class="field"
-           style="margin-bottom:14px;">
-
-        <label>ชื่อผู้ใช้งาน</label>
-
-        <input
-          type="text"
-          id="adminUsername"
-          placeholder="กรอกชื่อผู้ใช้งานแอดมิน">
-
-      </div>
-
-
-      <div class="field">
-
-        <label>รหัสผ่าน</label>
-
-        <input
-          type="password"
-          id="adminPassword"
-          placeholder="กรอกรหัสผ่าน">
-
-      </div>
-
-
-      <div
-        id="adminLoginError"
-        style="
-          display:none;
-          margin-top:14px;
-          padding:10px;
-          border-radius:8px;
-          background:#fdeceb;
-          color:#d1584c;
-          font-size:13px;
-        ">
-      </div>
-
-    </div>
-
-
-    <div class="modal-foot">
-
-      <button
-        class="btn-ghost"
-        type="button"
-        onclick="closeModal('adminLoginModal')">
-
-        ยกเลิก
-
-      </button>
-
-
-      <button
-        class="btn-ghost solid"
-        type="button"
-        id="adminLoginBtn">
-
-        เข้าสู่ระบบ
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-    <button class="nav-item" id="adminLoginNav">
-  <svg viewBox="0 0 24 24"
-       fill="none"
-       stroke="currentColor"
-       stroke-width="2">
-    <path d="M12 2l8 4v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/>
-  </svg>
-
-  <span class="label">ผู้ดูแลระบบ</span>
-
-  <span class="nav-badge"
-        id="adminNavBadge"
-        style="display:none;">
-    0
-  </span>
-</button>
-
     <div class="main">
       <!-- HOME -->
 <div class="page active" id="page-home">
@@ -3535,129 +3318,63 @@ function loadHistory(filter){
 document.getElementById('historySearch').addEventListener('input',e=>loadHistory(e.target.value));
 
 /* =========================================================
-   ADMIN LOGIN
+   ADMIN LOGIN (PUBLIC USERS / ADMIN ONLY)
 ========================================================= */
-
-/*
-  เปลี่ยน username และ password ตรงนี้ได้
-*/
-
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "123456";
-
-
 let isAdmin = false;
 
+function openAdminLogin(){
+  const modal=document.getElementById('adminLoginModal');
+  const error=document.getElementById('adminLoginError');
+  if(error) error.style.display='none';
+  if(modal) modal.classList.add('open');
+}
 
-/* เปิดหน้า Login Admin */
+function closeAdminLogin(){
+  const modal=document.getElementById('adminLoginModal');
+  if(modal) modal.classList.remove('open');
+}
 
-document
-  .getElementById("adminLoginNav")
-  .addEventListener("click", function () {
+const adminLoginNav=document.getElementById('adminLoginNav');
+if(adminLoginNav){
+  adminLoginNav.addEventListener('click',()=>{
+    if(isAdmin) goPage('admin'); else openAdminLogin();
+  });
+}
 
-    if (isAdmin) {
-
-      goPage("admin");
-
+const adminLoginBtn=document.getElementById('adminLoginBtn');
+if(adminLoginBtn){
+  adminLoginBtn.addEventListener('click',()=>{
+    const username=(document.getElementById('adminUsername')?.value||'').trim();
+    const password=document.getElementById('adminPassword')?.value||'';
+    const error=document.getElementById('adminLoginError');
+    if(error) error.style.display='none';
+    if(username!==ADMIN_USERNAME || password!==ADMIN_PASSWORD){
+      if(error){ error.textContent='ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง'; error.style.display='block'; }
       return;
-
     }
-
-    document
-      .getElementById("adminLoginModal")
-      .classList
-      .add("open");
-
+    isAdmin=true;
+    document.getElementById('adminUsername').value='';
+    document.getElementById('adminPassword').value='';
+    closeAdminLogin();
+    goPage('admin');
+    if(typeof updateAdminBadge==='function') updateAdminBadge();
   });
+}
 
+['adminUsername','adminPassword'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter') adminLoginBtn?.click();});
+});
 
-
-/* ปุ่มเข้าสู่ระบบ Admin */
-
-document
-  .getElementById("adminLoginBtn")
-  .addEventListener("click", function () {
-
-    const username =
-      document
-        .getElementById("adminUsername")
-        .value
-        .trim();
-
-    const password =
-      document
-        .getElementById("adminPassword")
-        .value;
-
-    const error =
-      document
-        .getElementById("adminLoginError");
-
-
-    error.style.display = "none";
-
-
-    /* ตรวจสอบ Username */
-
-    if (
-      username !== ADMIN_USERNAME ||
-      password !== ADMIN_PASSWORD
-    ) {
-
-      error.textContent =
-        "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
-
-      error.style.display = "block";
-
-      return;
-
-    }
-
-
-    /* Login สำเร็จ */
-
-    isAdmin = true;
-
-
-    document
-      .getElementById("adminUsername")
-      .value = "";
-
-
-    document
-      .getElementById("adminPassword")
-      .value = "";
-
-
-    closeModal("adminLoginModal");
-
-
-    alert("เข้าสู่ระบบผู้ดูแลเรียบร้อย");
-
-
-    goPage("admin");
-
-
-    updateAdminBadge();
-
-
-    document
-  .getElementById("adminLogoutBtn")
-  .addEventListener("click", function () {
-
-    isAdmin = false;
-
-
-    alert(
-      "ออกจากระบบผู้ดูแลเรียบร้อย"
-    );
-
-
-    goPage("home");
-
+const adminLogoutBtn=document.getElementById('adminLogoutBtn');
+if(adminLogoutBtn){
+  adminLogoutBtn.addEventListener('click',()=>{
+    isAdmin=false;
+    goPage('home');
   });
-
-  });
+}
 
 /* =========================================================
    SET MODE (๔.๓) — ชุดเอกสารครบชุด
@@ -3945,5 +3662,30 @@ document.getElementById('setResetBtn').addEventListener('click',function(){
   window.addEventListener('load',forcePublicApp);
 })();
 </script>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="adminLoginModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">เข้าสู่ระบบผู้ดูแล</div>
+      <button class="modal-close" type="button" onclick="closeAdminLogin()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:14px;">
+        <label>ชื่อผู้ใช้งาน</label>
+        <input type="text" id="adminUsername" placeholder="กรอกชื่อผู้ใช้งานแอดมิน" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>รหัสผ่าน</label>
+        <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน" autocomplete="current-password">
+      </div>
+      <div id="adminLoginError" style="display:none;margin-top:14px;padding:10px;border-radius:8px;background:#fdeceb;color:#d1584c;font-size:13px;"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" type="button" onclick="closeAdminLogin()">ยกเลิก</button>
+      <button class="btn-ghost solid" type="button" id="adminLoginBtn">เข้าสู่ระบบ</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
