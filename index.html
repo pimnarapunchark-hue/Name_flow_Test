@@ -2272,7 +2272,11 @@ function goPage(name){
   }
 
 }
-navItems.forEach(n=>n.addEventListener('click',()=>goPage(n.dataset.page)));
+navItems.forEach(n => {
+  if (n.dataset.page) {
+    n.addEventListener('click', () => goPage(n.dataset.page));
+  }
+});
 document.querySelectorAll('[data-settings-tab]').forEach(btn=>btn.addEventListener('click',()=>{
   const tab=btn.dataset.settingsTab;
   document.querySelectorAll('[data-settings-tab]').forEach(b=>b.classList.toggle('active',b===btn));
