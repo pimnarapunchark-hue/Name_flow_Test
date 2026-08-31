@@ -3343,30 +3343,32 @@ if(adminLoginNav){
   });
 }
 
-const adminLoginBtn=document.getElementById('adminLoginBtn');
-if(adminLoginBtn){
-  adminLoginBtn.addEventListener('click',()=>{
-    const username=(document.getElementById('adminUsername')?.value||'').trim();
-    const password=document.getElementById('adminPassword')?.value||'';
-    const error=document.getElementById('adminLoginError');
-    if(error) error.style.display='none';
-    if(username!==ADMIN_USERNAME || password!==ADMIN_PASSWORD){
-      if(error){ error.textContent='ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง'; error.style.display='block'; }
-      return;
-    }
-    isAdmin=true;
-    document.getElementById('adminUsername').value='';
-    document.getElementById('adminPassword').value='';
-    closeAdminLogin();
-    goPage('admin');
-    if(typeof updateAdminBadge==='function') updateAdminBadge();
-  });
-}
+/* ฟังก์ชันล็อกอินแอดมิน
+   ใช้เป็นฟังก์ชันโดยตรง เพราะ HTML ของ Modal อยู่ท้ายไฟล์
+   จึงไม่ผูก Event Listener ก่อนที่ปุ่มจะถูกสร้าง */
+function submitAdminLogin(){
+  const username=(document.getElementById('adminUsername')?.value||'').trim();
+  const password=document.getElementById('adminPassword')?.value||'';
+  const error=document.getElementById('adminLoginError');
 
-['adminUsername','adminPassword'].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter') adminLoginBtn?.click();});
-});
+  if(error) error.style.display='none';
+
+  if(username!==ADMIN_USERNAME || password!==ADMIN_PASSWORD){
+    if(error){
+      error.textContent='ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง';
+      error.style.display='block';
+    }
+    return;
+  }
+
+  isAdmin=true;
+  document.getElementById('adminUsername').value='';
+  document.getElementById('adminPassword').value='';
+  closeAdminLogin();
+  goPage('admin');
+
+  if(typeof updateAdminBadge==='function') updateAdminBadge();
+}
 
 const adminLogoutBtn=document.getElementById('adminLogoutBtn');
 if(adminLogoutBtn){
@@ -3683,9 +3685,25 @@ document.getElementById('setResetBtn').addEventListener('click',function(){
     </div>
     <div class="modal-foot">
       <button class="btn-ghost" type="button" onclick="closeAdminLogin()">ยกเลิก</button>
-      <button class="btn-ghost solid" type="button" id="adminLoginBtn">เข้าสู่ระบบ</button>
+      <button class="btn-ghost solid" type="button" id="adminLoginBtn" onclick="submitAdminLogin()">เข้าสู่ระบบ</button>
     </div>
   </div>
 </div>
+
+<script>
+/* รองรับการกด Enter ในช่องชื่อผู้ใช้หรือรหัสผ่าน */
+(function(){
+  ['adminUsername','adminPassword'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){
+        e.preventDefault();
+        submitAdminLogin();
+      }
+    });
+  });
+})();
+</script>
 </body>
 </html>
