@@ -9,6 +9,57 @@
 <style>
 :root{--navy:#0f2f36;--teal:#186670;--teal2:#1c7d87;--soft:#e5f3f4;--bg:#eef4f4;--panel:#fff;--ink:#152325;--muted:#718386;--line:#dce7e8;--gold:#b98a34;--shadow:0 12px 35px rgba(15,47,54,.10)}
 *{box-sizing:border-box}body{margin:0;font-family:'Noto Sans Thai','Sarabun',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}.top{background:linear-gradient(135deg,var(--navy),var(--teal) 60%,var(--teal2));color:#fff;padding:20px 0}.top-inner{max-width:1100px;margin:auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;gap:20px}.brand{font-weight:800;font-size:18px}.back{display:inline-flex;align-items:center;text-decoration:none;color:#fff;background:rgba(255,255,255,.14);padding:8px 15px;border-radius:9px;font-size:13px}.hero{max-width:1100px;margin:0 auto;padding:48px 24px 28px}.hero-card{background:linear-gradient(135deg,#fff,#f5fbfb);border:1px solid var(--line);border-radius:22px;padding:38px;box-shadow:var(--shadow)}.badge{display:inline-block;background:var(--soft);color:var(--teal);font-size:12px;font-weight:800;padding:5px 12px;border-radius:99px}.hero h1{font-size:32px;line-height:1.35;margin:12px 0 8px}.hero p{color:var(--muted);margin:0;max-width:800px}.container{max-width:1100px;margin:0 auto;padding:0 24px 48px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0 28px}.mini{background:#fff;border:1px solid var(--line);border-radius:15px;padding:20px}.mini b{display:block;color:var(--teal);font-size:16px}.section{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;margin-bottom:20px;box-shadow:0 4px 18px rgba(15,47,54,.04)}h2{font-size:22px;margin:0 0 14px;color:var(--navy)}h3{font-size:16px;margin:20px 0 8px;color:var(--teal)}ul{padding-left:24px;margin:8px 0}.rule{display:flex;gap:12px;align-items:flex-start;padding:14px;border-bottom:1px solid var(--line)}.rule:last-child{border-bottom:0}.num{width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--teal);font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}.code{background:#0f2f36;color:#e8ffff;padding:14px 16px;border-radius:10px;font-family:Consolas,monospace;font-size:13px;overflow:auto;white-space:nowrap;margin:12px 0}.example{border-left:4px solid var(--gold);background:#fcfaf5;padding:15px 17px;border-radius:8px;margin-top:12px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:700px}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#f7fbfb;color:var(--teal);font-size:13px}.callout{background:var(--soft);border-radius:12px;padding:16px 18px;color:#315156}.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.btn{display:inline-flex;text-decoration:none;background:linear-gradient(135deg,var(--teal2),var(--teal));color:#fff;padding:10px 16px;border-radius:9px;font-weight:700;font-size:13px}.btn.secondary{background:#fff;color:var(--teal);border:1px solid var(--teal)}.foot{max-width:1100px;margin:auto;padding:0 24px 35px;color:var(--muted);font-size:12px}@media(max-width:760px){.grid{grid-template-columns:1fr}.top-inner{padding:0 16px}.hero,.container{padding-left:16px;padding-right:16px}.hero-card{padding:25px}.hero h1{font-size:25px}.section{padding:20px}}
+.guide-images{
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+  margin-bottom:35px;
+}
+
+.guide-image-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 4px 18px rgba(15,47,54,.06);
+}
+
+.guide-image-card h2{
+  margin:0 0 15px;
+  color:var(--navy);
+  font-size:22px;
+}
+
+.guide-image-card img{
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:10px;
+}
+
+.structure-images{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  align-items:center;
+}
+
+.structure-images img{
+  width:100%;
+  max-width:768px;
+  height:auto;
+  border:1px solid var(--line);
+}
+
+@media(max-width:760px){
+  .guide-image-card{
+    padding:12px;
+  }
+
+  .guide-image-card h2{
+    font-size:18px;
+  }
+}
 </style>
 </head>
 <body>
@@ -17,6 +68,42 @@
 <section class="hero"><div class="hero-card"><span class="badge">GUIDELINE</span><h1>แนวทางการตั้งชื่อไฟล์เอกสาร</h1><p>เอกสารฉบับนี้จัดทำเพื่อใช้เป็นแนวทางในการกำหนดชื่อไฟล์ให้เป็นรูปแบบเดียวกัน ค้นหาได้ง่าย ตรวจสอบข้อมูลสะดวก และสอดคล้องกับโครงสร้างที่ใช้งานในระบบ NAMEFLOW</p></div></section>
 
 <main class="container">
+    <!-- รูปภาพแนวทาง -->
+<div class="guide-images">
+
+  <!-- Banner -->
+  <section class="guide-image-card">
+    <img src="images/banner(1).png"
+         alt="แนวทางการกำหนดชื่อไฟล์">
+  </section>
+
+
+  <!-- รหัสตัวอักษรโรมัน -->
+  <section class="guide-image-card">
+    <h2>รหัสตัวอักษรโรมันประจำกระทรวง ส่วนราชการและจังหวัด</h2>
+
+    <img src="images/roman-code.png"
+         alt="รหัสตัวอักษรโรมันประจำกระทรวง ส่วนราชการและจังหวัด">
+  </section>
+
+
+  <!-- ตัวอย่างกำหนดชื่อไฟล์ -->
+  <section class="guide-image-card">
+    <h2>ตัวอย่างการกำหนดชื่อไฟล์</h2>
+
+    <div class="structure-images">
+      <img src="images/1.png"
+           alt="ตัวอย่างกำหนดชื่อไฟล์ 1">
+
+      <img src="images/2.png"
+           alt="ตัวอย่างกำหนดชื่อไฟล์ 2">
+
+      <img src="images/3.png"
+           alt="ตัวอย่างกำหนดชื่อไฟล์ 3">
+    </div>
+  </section>
+
+</div>
 <div class="grid"><div class="mini"><b>1. เป็นระบบ</b><span>ใช้ลำดับข้อมูลเดิมอย่างสม่ำเสมอ</span></div><div class="mini"><b>2. เข้าใจง่าย</b><span>ชื่อไฟล์ควรสื่อความหมายของเอกสาร</span></div><div class="mini"><b>3. ค้นหาได้เร็ว</b><span>ใช้ข้อมูลสำคัญที่ช่วยระบุเอกสารได้ชัดเจน</span></div></div>
 
 <section class="section"><h2>1. หลักการตั้งชื่อไฟล์</h2><div class="rule"><div class="num">1</div><div><b>ใช้ข้อมูลที่จำเป็นต่อการระบุเอกสาร</b><br>เช่น วันที่ หน่วยงาน ประเภทเอกสาร ชื่อเรื่อง หรือผู้รับ ตามความเหมาะสมของเอกสาร</div></div><div class="rule"><div class="num">2</div><div><b>เรียงข้อมูลตามโครงสร้างเดียวกัน</b><br>เมื่อเป็นเอกสารประเภทเดียวกันควรใช้ลำดับองค์ประกอบเหมือนกัน</div></div><div class="rule"><div class="num">3</div><div><b>ใช้ตัวคั่นอย่างสม่ำเสมอ</b><br>แนะนำให้ใช้เครื่องหมาย <b>_</b> เพื่อแยกข้อมูลแต่ละส่วนของชื่อไฟล์</div></div><div class="rule"><div class="num">4</div><div><b>ตรวจสอบก่อนนำไปใช้</b><br>ตรวจสอบวันที่ หน่วยงาน เลขหนังสือ และชื่อเรื่องก่อนบันทึกชื่อไฟล์</div></div></section>
