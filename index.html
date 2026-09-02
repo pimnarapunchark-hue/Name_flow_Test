@@ -752,6 +752,57 @@ html,body{width:100%;height:100%;overflow-x:hidden;}
 
     </div>
 
+    <!-- ที่มาของการตั้งชื่อไฟล์ (แสดงในหน้าแรกโดยตรง ไม่ต้องคลิกเข้าไปหน้าอื่น) -->
+    <div class="home-source-section" style="margin:26px 0 30px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 28px;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+        <div style="font-size:17px;font-weight:800;color:var(--navy-900);">ที่มาของการตั้งชื่อไฟล์</div>
+        <a class="btn-primary" href="ระเบียบสารบรรณสำนักนายกรัฐมนตรี.pdf" target="_blank" style="display:inline-flex;text-decoration:none;font-size:12.5px;padding:9px 16px;">เปิดไฟล์ระเบียบสารบรรณสำนักนายกรัฐมนตรี (PDF)</a>
+      </div>
+      <p style="line-height:1.9;color:var(--ink-700);font-size:13.5px;margin:0 0 16px;">
+        หลักเกณฑ์การตั้งชื่อไฟล์อิเล็กทรอนิกส์ ตามระเบียบสำนักนายกรัฐมนตรี ว่าด้วยงานสารบรรณ (ฉบับที่ 4) พ.ศ. 2564 มีข้อกำหนดอย่างเป็นระบบดังนี้
+      </p>
+
+      <div style="font-size:14px;font-weight:700;color:var(--teal-700);margin:18px 0 8px;">1. เกณฑ์พื้นฐานทั่วไป</div>
+      <ul style="margin:0 0 4px;padding-left:20px;line-height:1.9;color:var(--ink-700);font-size:13.5px;">
+        <li><b>ตัวเลข:</b> กำหนดให้ใช้เลขอารบิกเท่านั้น</li>
+        <li><b>เครื่องหมายเชื่อม:</b> ให้ใช้เครื่องหมายขีดล่าง (Underscore: _) แทนการเว้นวรรค หรือแทนเครื่องหมายและสัญลักษณ์พิเศษอื่น ๆ ที่ระบบคอมพิวเตอร์ไม่อนุญาตให้ใช้ในการตั้งชื่อไฟล์ (เช่น /, ., $)</li>
+      </ul>
+
+      <div style="font-size:14px;font-weight:700;color:var(--teal-700);margin:18px 0 8px;">2. โครงสร้างการตั้งชื่อไฟล์หนังสือราชการส่ง</div>
+      <p style="line-height:1.9;color:var(--ink-700);font-size:13.5px;margin:0 0 8px;">การตั้งชื่อไฟล์หนังสือหลัก ให้เรียงลำดับตามส่วนประกอบดังนี้:</p>
+      <ol style="margin:0 0 10px;padding-left:20px;line-height:1.9;color:var(--ink-700);font-size:13.5px;">
+        <li>ปีพุทธศักราช (เช่น 2564)</li>
+        <li>รหัสตัวอักษรโรมันประจำส่วนราชการ (เช่น OPM สำหรับสำนักนายกรัฐมนตรี หรือรหัสจังหวัด เช่น BKK, PYO ตามที่กำหนดแนบท้ายภาคผนวก 7)</li>
+        <li>เลขประจำของส่วนราชการเจ้าของเรื่อง</li>
+        <li>เลขที่ของหนังสือตามทะเบียนหนังสือส่ง</li>
+      </ol>
+      <div style="background:var(--teal-100);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--navy-900);font-family:monospace;margin-bottom:6px;">
+        รูปแบบ: [ปีพุทธศักราช]_[รหัสตัวอักษรส่วนราชการ][เลขประจำเจ้าของเรื่อง]_[เลขที่หนังสือส่ง].pdf
+      </div>
+
+      <div style="font-size:14px;font-weight:700;color:var(--teal-700);margin:18px 0 8px;">3. กรณีมีหลายไฟล์ (เอกสารแนบ / สิ่งที่ส่งมาด้วย)</div>
+      <p style="line-height:1.9;color:var(--ink-700);font-size:13.5px;margin:0 0 8px;">หากมีสิ่งที่ส่งมาด้วยจำนวนมากและจำเป็นต้องแยกไฟล์ ให้ปฏิบัติดังนี้:</p>
+      <ul style="margin:0 0 8px;padding-left:20px;line-height:1.9;color:var(--ink-700);font-size:13.5px;">
+        <li>ตั้งชื่อไฟล์หลักของหนังสือราชการส่งก่อน</li>
+        <li>เชื่อมด้วยเครื่องหมายขีดล่าง (_) ตามด้วยตัวเลขตั้งแต่เลข 1 เป็นต้นไปตามลำดับ เพื่อระบุไฟล์แนบ</li>
+      </ul>
+      <p style="line-height:1.9;color:var(--ink-500);font-size:12.5px;margin:0 0 6px;">
+        ข้อสังเกต: ตัวเลขลำดับไฟล์แนบนี้ไม่ต้องคำนึงว่าจะต้องเป็นตัวเลขเดียวกับเลขลำดับของสิ่งที่ส่งมาด้วยที่ระบุไว้ในตัวหนังสือราชการหลักหรือไม่
+      </p>
+
+      <div style="font-size:14px;font-weight:700;color:var(--teal-700);margin:18px 0 8px;">4. ตัวอย่างการตั้งชื่อไฟล์ตามระเบียบ</div>
+      <ul style="margin:0 0 4px;padding-left:20px;line-height:1.9;color:var(--ink-700);font-size:13.5px;">
+        <li>ไฟล์หนังสือหลัก: <code>2564_OPM0913_56.pdf</code></li>
+        <li>สิ่งที่ส่งมาด้วย ลำดับที่ 1: <code>2564_OPM0913_56_1.pdf</code></li>
+        <li>สิ่งที่ส่งมาด้วย ลำดับที่ 2: <code>2564_OPM0913_56_2.pdf</code></li>
+      </ul>
+
+      <div style="font-size:14px;font-weight:700;color:var(--teal-700);margin:18px 0 8px;">5. ข้อกำหนดด้านประเภทไฟล์และความละเอียดที่เกี่ยวข้อง</div>
+      <ul style="margin:0;padding-left:20px;line-height:1.9;color:var(--ink-700);font-size:13.5px;">
+        <li>สำหรับการจัดส่งทางไปรษณีย์อิเล็กทรอนิกส์ (อีเมล): ให้แปลงเอกสารเป็นไฟล์ PDF เดียวกัน โดยมีความละเอียดไม่น้อยกว่า 300 dpi (เว้นแต่กรณีที่สิ่งที่จะส่งไปด้วยมีจำนวนหน้ามาก จึงอนุญาตให้แยกไฟล์ตามเกณฑ์ในข้อ 3 ได้)</li>
+        <li>สำหรับการสำรองข้อมูล (Backup) และส่งมอบกองจดหมายเหตุฯ: ให้นำเกณฑ์การตั้งชื่อไฟล์นี้ไปใช้โดยอนุโลม โดยจัดเก็บในรูปแบบมาตรฐาน เช่น PDF ความละเอียดไม่น้อยกว่า 150 dpi</li>
+      </ul>
+    </div>
 
     <!-- สถิติ -->
     <div class="home-stats">
@@ -767,7 +818,7 @@ html,body{width:100%;height:100%;overflow-x:hidden;}
       </div>
 
       <div class="home-stat">
-        <b id="statMenuCount">6</b>
+        <b id="statMenuCount">5</b>
         <span>เมนูในระบบ</span>
       </div>
 
@@ -830,11 +881,6 @@ html,body{width:100%;height:100%;overflow-x:hidden;}
   </span>
 </a>
 
-
-      <button class="home-menu-btn" data-page="source">
-        <b>ที่มาของการตั้งชื่อไฟล์</b>
-        <span>ดูหลักเกณฑ์อ้างอิงและเปิดไฟล์ระเบียบสารบรรณ</span>
-      </button>
 
       <button
         class="home-menu-btn"
