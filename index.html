@@ -3397,16 +3397,55 @@ function loadHistory(filter){
 document.getElementById('historySearch').addEventListener('input',e=>loadHistory(e.target.value));
 
 /* =========================================================
-   ADMIN LOGIN (PUBLIC USERS / ADMIN ONLY)
+   ADMIN LOGIN / REGISTER
+   ครั้งแรกที่ยังไม่มีบัญชีผู้ดูแลระบบ -> ให้สมัคร (ตั้งชื่อผู้ใช้งาน+รหัสผ่านเอง)
+   ครั้งต่อไป -> ใช้ชื่อผู้ใช้งาน/รหัสผ่านเดิมเพื่อเข้าสู่ระบบ
 ========================================================= */
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "123456";
+const ADMIN_ACCOUNT_KEY='nameflow_admin_account';
 let isAdmin = false;
+
+function getAdminAccount(){
+  try{ return JSON.parse(localStorage.getItem(ADMIN_ACCOUNT_KEY)||'null'); }
+  catch(e){ return null; }
+}
+function saveAdminAccount(acc){
+  localStorage.setItem(ADMIN_ACCOUNT_KEY, JSON.stringify(acc));
+}
+function isAdminRegisterMode(){
+  return !getAdminAccount();
+}
+
+function refreshAdminModalMode(){
+  const registerMode=isAdminRegisterMode();
+  const title=document.getElementById('adminModalTitle');
+  const sub=document.getElementById('adminModalSub');
+  const confirmField=document.getElementById('adminConfirmField');
+  const submitBtn=document.getElementById('adminLoginBtn');
+  const resetLink=document.getElementById('adminResetLink');
+
+  if(registerMode){
+    if(title) title.textContent='สมัครบัญชีผู้ดูแลระบบ';
+    if(sub) sub.textContent='ยังไม่มีบัญชีผู้ดูแลระบบในเครื่องนี้ กรุณาตั้งชื่อผู้ใช้งานและรหัสผ่าน เพื่อใช้เข้าสู่ระบบในครั้งต่อไป';
+    if(confirmField) confirmField.style.display='block';
+    if(submitBtn) submitBtn.textContent='สมัครและเข้าสู่ระบบ';
+    if(resetLink) resetLink.style.display='none';
+  } else {
+    if(title) title.textContent='เข้าสู่ระบบผู้ดูแล';
+    if(sub) sub.textContent='';
+    if(confirmField) confirmField.style.display='none';
+    if(submitBtn) submitBtn.textContent='เข้าสู่ระบบ';
+    if(resetLink) resetLink.style.display='block';
+  }
+}
 
 function openAdminLogin(){
   const modal=document.getElementById('adminLoginModal');
   const error=document.getElementById('adminLoginError');
   if(error) error.style.display='none';
+  const un=document.getElementById('adminUsername'); if(un) un.value='';
+  const pw=document.getElementById('adminPassword'); if(pw) pw.value='';
+  const pwc=document.getElementById('adminPasswordConfirm'); if(pwc) pwc.value='';
+  refreshAdminModalMode();
   if(modal) modal.classList.add('open');
 }
 
@@ -3422,7 +3461,7 @@ if(adminLoginNav){
   });
 }
 
-/* ฟังก์ชันล็อกอินแอดมิน
+/* ฟังก์ชันล็อกอิน/สมัครแอดมิน
    ใช้เป็นฟังก์ชันโดยตรง เพราะ HTML ของ Modal อยู่ท้ายไฟล์
    จึงไม่ผูก Event Listener ก่อนที่ปุ่มจะถูกสร้าง */
 function submitAdminLogin(){
@@ -3430,23 +3469,45 @@ function submitAdminLogin(){
   const password=document.getElementById('adminPassword')?.value||'';
   const error=document.getElementById('adminLoginError');
 
+  function showErr(msg){
+    if(error){ error.textContent=msg; error.style.display='block'; }
+  }
   if(error) error.style.display='none';
 
-  if(username!==ADMIN_USERNAME || password!==ADMIN_PASSWORD){
-    if(error){
-      error.textContent='ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง';
-      error.style.display='block';
+  if(!username){ showErr('กรุณากรอกชื่อผู้ใช้งาน'); return; }
+  if(!password){ showErr('กรุณากรอกรหัสผ่าน'); return; }
+
+  if(isAdminRegisterMode()){
+    const confirmPw=document.getElementById('adminPasswordConfirm')?.value||'';
+    if(password.length<4){ showErr('รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร'); return; }
+    if(password!==confirmPw){ showErr('รหัสผ่านยืนยันไม่ตรงกัน'); return; }
+    saveAdminAccount({username,password});
+  } else {
+    const account=getAdminAccount();
+    if(!account || username!==account.username || password!==account.password){
+      showErr('ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง');
+      return;
     }
-    return;
   }
 
   isAdmin=true;
   document.getElementById('adminUsername').value='';
   document.getElementById('adminPassword').value='';
+  const pwc=document.getElementById('adminPasswordConfirm'); if(pwc) pwc.value='';
   closeAdminLogin();
   goPage('admin');
 
   if(typeof updateAdminBadge==='function') updateAdminBadge();
+}
+
+/* รีเซ็ตบัญชีผู้ดูแลระบบ (กรณีลืมรหัสผ่าน) แล้วกลับไปที่โหมดสมัครใหม่ */
+function resetAdminAccount(){
+  if(confirm('ต้องการรีเซ็ตบัญชีผู้ดูแลระบบใช่หรือไม่? หลังรีเซ็ตคุณจะต้องสมัครบัญชีแอดมินใหม่')){
+    localStorage.removeItem(ADMIN_ACCOUNT_KEY);
+    const un=document.getElementById('adminUsername'); if(un) un.value='';
+    const pw=document.getElementById('adminPassword'); if(pw) pw.value='';
+    refreshAdminModalMode();
+  }
 }
 
 const adminLogoutBtn=document.getElementById('adminLogoutBtn');
@@ -3743,23 +3804,29 @@ document.getElementById('setResetBtn').addEventListener('click',function(){
 })();
 </script>
 
-<!-- ADMIN LOGIN MODAL -->
+<!-- ADMIN LOGIN / REGISTER MODAL -->
 <div class="modal-overlay" id="adminLoginModal">
   <div class="modal-card">
     <div class="modal-head">
-      <div class="modal-title">เข้าสู่ระบบผู้ดูแล</div>
+      <div class="modal-title" id="adminModalTitle">เข้าสู่ระบบผู้ดูแล</div>
       <button class="modal-close" type="button" onclick="closeAdminLogin()">✕</button>
     </div>
     <div class="modal-body">
+      <div id="adminModalSub" style="font-size:12.5px;color:var(--ink-500);margin:-6px 0 16px;line-height:1.6;"></div>
       <div class="field" style="margin-bottom:14px;">
         <label>ชื่อผู้ใช้งาน</label>
         <input type="text" id="adminUsername" placeholder="กรอกชื่อผู้ใช้งานแอดมิน" autocomplete="username">
       </div>
-      <div class="field">
+      <div class="field" style="margin-bottom:14px;">
         <label>รหัสผ่าน</label>
         <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน" autocomplete="current-password">
       </div>
+      <div class="field" id="adminConfirmField" style="display:none;">
+        <label>ยืนยันรหัสผ่าน</label>
+        <input type="password" id="adminPasswordConfirm" placeholder="กรอกรหัสผ่านอีกครั้ง" autocomplete="new-password">
+      </div>
       <div id="adminLoginError" style="display:none;margin-top:14px;padding:10px;border-radius:8px;background:#fdeceb;color:#d1584c;font-size:13px;"></div>
+      <div id="adminResetLink" onclick="resetAdminAccount()" style="display:none;margin-top:12px;font-size:12.5px;color:var(--teal-700);cursor:pointer;text-decoration:underline;">ลืมรหัสผ่าน? รีเซ็ตบัญชีผู้ดูแลระบบ</div>
     </div>
     <div class="modal-foot">
       <button class="btn-ghost" type="button" onclick="closeAdminLogin()">ยกเลิก</button>
